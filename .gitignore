@@ -3,3 +3,5 @@
 __pycach__/*
 /migrations/*
 /ref_data/*
+
+db.sqlite3
