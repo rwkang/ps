@@ -1,0 +1,356 @@
+{#{% extends 'ppp/index.html' %}#}
+{#{% load static %}#}
+{#{% block contentChart2 %}#}
+
+{#<div id="myCanvas" class="chart-container" style="position: relative; height: 300px; width: 90vw">#}
+<div id="chartArea" class="chart-container" style="position: relative; height: 300px; width: 90vw">
+    <div id="chartLegend">
+{#        <canvas id="myChart" height="110"></canvas>#}
+        <canvas id="canvas" height="110"></canvas>
+    </div>
+</div>
+
+<div id="space-after-chart">
+    <br>
+{#    <br>#}
+{#    <br>#}
+{#    <br>#}
+{#    <br>#}
+{#    <br>#}
+{#    <br>#}
+</div>
+
+<script type="text/javascript">
+
+    let languageNo = parseInt('{{ LANGUAGE_NO | escapejs }}');
+
+    {#let needsHourTotal = parseInt('{{ needsHourSum | escapejs }}');#}
+    {#let planQtyTotal = parseInt('{{ planQtySum | escapejs }}');#}
+    {#console.log("current.html 0 planQtyTotal: ", planQtyTotal);#}
+
+    let planqtySumTotal = parseInt('{{ planqtySum | escapejs }}');
+    let goodnessTotal = parseInt('{{ goodnessSum | escapejs }}');
+    let goodnessCumsumTotal = parseInt('{{ goodnessCumsumSum | escapejs }}');
+    console.log("current.html 0 planqtySumTotal: ", planqtySumTotal);
+    console.log("current.html 0 goodnessTotal: ", goodnessTotal);
+    console.log("current.html 0 goodnessCumsumTotal: ", goodnessCumsumTotal);
+
+    let fromDateString = '{{ fromDate | escapejs }}';
+    let toDateString = '{{ toDate | escapejs }}';
+    document.getElementById("fromDate").value = fromDateString; // 결론적으로 이렇게 사용하기로 한다. : 이것도 잘 되고...
+    document.getElementById("toDate").value = toDateString; // 결론적으로 이렇게 사용하기로 한다. : 이것도 잘 되고...
+    {#console.log("current.html 0 fromDateString: ", fromDateString);#}
+    {#console.log("current.html 0 toDateString: ", toDateString);#}
+
+    // 0. 공정 정보
+    let processCodeCurrent = '{{ processCode | escapejs }}';
+    {#console.log("current.html 0 processCodeCurrent: ", processCodeCurrent);#}
+    {#console.log("current.html 0 typeof processCodeCurrent: ", typeof processCodeCurrent);#}
+
+    // 10. x축 세팅...
+    var ppDataPeriod = '{{ ppDataPeriod | escapejs}}'; // string [[''],[''],['']...['']]
+    console.log("21 current.html typeof ppDataPeriod: ", typeof ppDataPeriod);
+    console.log("21 current.html ppDataPeriod: ", ppDataPeriod);
+
+    var ppDataPeriodArr = ppDataPeriod.split(","); // object ["[['']","['']","['']"...]
+    console.log("22 current.html ppDataPeriodArr.length: ", ppDataPeriodArr.length);
+    console.log("22 current.html typeof ppDataPeriodArr: ", typeof ppDataPeriodArr);
+    console.log("22 current.html ppDataPeriodArr: ", ppDataPeriodArr);
+
+    // String 타입 자료를 List 자료형으로 변경
+    var ppDataPeriodArrList = []; // object ["''","''","''"...] : 중간 괄호를 아래에서 빼 낸다.
+    for (let i = 0; i < ppDataPeriodArr.length; i++) {
+        var fromSingleQuotation = ppDataPeriodArr[i].indexOf("'");
+        //console.log("22 fromSingleQuotation: ", fromSingleQuotation);
+        //console.log("22 ppDataPeriod[i]: ", ppDataPeriodArr[i]);
+        var toSingleQuotation = ppDataPeriodArr[i].indexOf("'", fromSingleQuotation + 1);
+        //console.log("22 toSingleQuotation: ", toSingleQuotation);
+        ppDataPeriodArrList.push(ppDataPeriodArr[i].substring(fromSingleQuotation, toSingleQuotation + 1));
+    };
+    console.log("23 current.html typeof ppDataPeriodArrList: ", typeof ppDataPeriodArrList);
+    console.log("23 current.html ppDataPeriodArrList: ", ppDataPeriodArrList);
+
+    // 20. legend 그룹
+    {#var products = '{{ products | escapejs}}';#}
+    var products = '{{ products | escapejs}}'; // string
+    {#console.log("25 current.html typeof products: ", typeof products);#}
+    {#console.log("25 current.html products: ", products);#}
+
+    // 21. legend 수 : 위에서 받은 products 아직 string 타입이므로, 그 lenght가 엄청 많다. 1개 글자 수...
+    //     그러므로 아래에서 javascript 리스트 타입으로 변경한 후에, 그 length를 구해야 한다.
+    var productsArr = products.split(",");
+    {#console.log("26 current.html productsArr.length: ", productsArr.length);#}
+    {#console.log("26 current.html typeof productsArr: ", typeof productsArr);#}
+    {#console.log("26 current.html productsArr: ", productsArr);#}
+    var productsArrList = [];
+    for (let i = 0; i < productsArr.length; i++) {
+        var fromSingleQuotation = productsArr[i].indexOf("'");
+        {#console.log("26 current.html fromSingleQuotation: ", fromSingleQuotation);#}
+        if (fromSingleQuotation < 0) {
+            continue;
+        } else {
+            var toSingleQuotation = productsArr[i].lastIndexOf("'");
+            {#console.log("26 current.html toSingleQuotation: ", toSingleQuotation);#}
+            var product = productsArr[i].substr(fromSingleQuotation, toSingleQuotation)
+            productsArrList.push(product)
+        }
+    }
+    {#console.log("266 current.html productsArrList.length: ", productsArrList.length);#}
+    {#console.log("266 current.html typeof productsArrList: ", typeof productsArrList);#}
+    {#console.log("266 current.html productsArrList: ", productsArrList);#}
+    {#console.log("27 current.html productsArrList[1]: ", productsArrList[1]);#}
+
+    var productsCount = productsArrList.length;
+    {#console.log("24 current.html typeof productsCount: ", typeof productsCount);#}
+    console.log("24 current.html productsCount: ", productsCount);
+
+
+
+    {#context = {"qrProcess": qrProcess, "sqlQuerySets": sqlQuerySets, "jsonCurrent": jsonCurrent,#}
+    {#           "ppDataPeriod": ppDataPeriod, "products": products, "goodnessSum": goodnessSum, "goodnessCumsumSum": goodnessCumsumSum,#}
+    {#           "goodnessList": goodnessList, "goodnessCumsumList": goodnessCumsumList,#}
+    {#           'fromDate': fromDate, 'toDate': toDate, 'processCode': processCode, "LANGUAGE_NO": LANGUAGE_NO,#}
+    {#           "revision": revision}#}
+
+    // 생산 수량 총계: goodnessSum, 생산 누계 수량 총계: goodnessCumsumSum
+
+    // 30. legend By x : x축(날짜)별 멀티 Data.
+    //     1) 날짜별 생산 실적 수량.goodness
+    {#var listGoodness = '{{ goodnessList | escapejs }}';#}
+    {#console.log("21 typeof listGoodness: ", typeof listGoodness);#}
+    {#console.log("21 listGoodness: ", listGoodness);#}
+
+    // 날짜별 생산 실적 누계 수량.goodnesscumsum
+    {#var listGodnessCumsum = '{{ goodnessCumsumList | escapejs }}';#}
+    {#console.log("22 typeof listGodnessCumsum: ", typeof listGodnessCumsum);#}
+    {#console.log("22 listGodnessCumsum: ", listGodnessCumsum);#}
+
+    // 30. legend By x : x축(날짜)별 멀티 Data (31: goodness, 32: goodnesscumsum, 33: planqty=ForecastHistoryDay.DPT)
+
+    // 31. 날짜별 생산 실적 수량.goodness
+    {#var ppDataPeriodProcessList = '{{ ppDataPeriodProcessList | escapejs}}';#}
+    {#var ppDataPeriodProcessList2 = '{{ ppDataPeriodProcessList2 | escapejs}}';#}
+    var ppDataPeriodProcessList = '{{ goodnessList | escapejs}}';
+    var ppDataPeriodProcessList2 = '{{ goodnessCumsumList | escapejs}}';
+    var ppDataPeriodProcessList3 = '{{ planqtyFinalList | escapejs}}';
+    console.log("281 typeof ppDataPeriodProcessList: ", typeof ppDataPeriodProcessList);
+    console.log("281 ppDataPeriodProcessList: ", ppDataPeriodProcessList);
+    console.log("282 typeof ppDataPeriodProcessList2: ", typeof ppDataPeriodProcessList2);
+    console.log("282 ppDataPeriodProcessList2: ", ppDataPeriodProcessList2);
+    console.log("283 typeof ppDataPeriodProcessList3: ", typeof ppDataPeriodProcessList3);
+    console.log("283 ppDataPeriodProcessList3: ", ppDataPeriodProcessList3);
+
+    var ppDataArr = ppDataPeriodProcessList.split("],");
+    var ppDataArr2 = ppDataPeriodProcessList2.split("],");
+    var ppDataArr3 = ppDataPeriodProcessList3.split("],");
+    console.log("29 ppDataArr.length: ", ppDataArr.length);
+    console.log("29 typeof ppDataArr: ", typeof ppDataArr);
+    console.log("29 ppDataArr: ", ppDataArr);
+
+    {#var ppDataPeriodProcessListArr = ppDataPeriodProcessList.split(",");#}
+    {#console.log("29 ppDataPeriodProcessListArr.length: ", ppDataPeriodProcessListArr.length);#}
+    {#console.log("29 typeof ppDataPeriodProcessListArr: ", typeof ppDataPeriodProcessListArr);#}
+    {#console.log("29 ppDataPeriodProcessListArr: ", ppDataPeriodProcessListArr);#}
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // arr[5][2] (빈 배열 생성)
+    // Arry 객체에 배열생성함수를 추가하여 2차원 배열을 생성하는 방법
+    Array.matrix = function (m, n, initial) {
+        var a, i, k, mat = [];
+        for (i = 0; i < m; i += 1) {
+            a = [];
+            for (k = 0; k < n; k += 1) {
+                a[k] = initial;
+            }
+            mat[i] = a;
+        }
+        return mat;
+    };
+
+    // matrix(행, 열, 기본값)
+    let first = ppDataPeriodArr.length;
+    let second = productsArr.length;
+    var ppQuantitiesDays = Array.matrix(first, second, 0);
+    console.log(`30 first: ${first}, second: ${second}`);
+    console.log("30 ppQuantitiesDays.length: ", ppQuantitiesDays.length);
+    console.log("30 typeof ppQuantitiesDays: ", typeof ppQuantitiesDays);
+    console.log("30 ppQuantitiesDays: ", ppQuantitiesDays);
+
+    // ppQuantitiesDays[0] = '2020-12-01'; ***** 이런식으로 [1차원] 배열에 [값]을 넣게 되면, [2차원] 배열을 못 쓴다.
+    //ppQuantitiesDays[0][0] = 222;
+    //console.log("30 ppQuantitiesDays[0]: ", ppQuantitiesDays[0]);
+    //console.log("30 ppQuantitiesDays[0][0]: ", ppQuantitiesDays[0[0]]);
+
+    var k = 0;
+    var ppQuantities = [];
+    for (let i = 0; i < ppDataArr.length; i++) {
+        var rows = ppDataArr[i];
+        rows = rows.replace(/Decimal/gi,"");
+        rows = rows.replace(/[\{\}\[\]\(\)\'\"\?\*]/gi,""); // [빽슬러쉬+특수문자] 형태로 적어줘야 한다...
+        //rows = rows.replace(/[\{\}\(\)\'\"\?\*]/gi,""); // [빽슬러쉬+특수문자] 형태로 적어줘야 한다...
+        rows = rows.replace(/.0000/gi,"");
+        var ppQuantities = rows.split(",");
+        // 여기서는 날짜별 생산 수량을 모으는 것이고, 아래에서 다시 [제품별] 생산 수량 리스트를 반드시 만들어야 한다.
+        for (let j = 1; j < ppQuantities.length; j++) {
+            ppQuantitiesDays[i][j-1] = Number(ppQuantities[j]); // ***** [j=0]은 [날짜 값]이 있음에 주의...
+            // 2021.03.06 Conclusion. ***** 특히 주의 ***** : [생산 실적 자료]는 첫번째 값이 [날짜]이므로,
+            // 두번째부터 마지막 값까지 가져가면 되지만, [생산 Capacity 자료 등] 첫번째 값부터 가져가야 하는 경우에는,
+            // 반드시 아래와 같이 첫번째 값(Number(ppQuantities[j - ])부터,
+            // 마지막 값(let j = 1; j<= ppQuantities.length; j++)까지 가져가게 해야 함에 특히 주의... [<=]: 작거나 같은 것 까지...
+        }
+    }
+    console.log("70 ppQuantitiesDays.length: ", ppQuantitiesDays.length);
+    console.log("70 typeof ppQuantitiesDays: ", typeof ppQuantitiesDays);
+    console.log("70 ppQuantitiesDays: ", ppQuantitiesDays);
+
+    // 여기서 다 [제품별] 생산 수량 리스트를 반드시 만들어야 한다. 이넘이 실제로 그래프에서 사용할 수 있는 [data] 임에 주의.
+    var k = 0;
+    var graphData = Array.matrix(second, first, 0);
+    for (let i = 0; i < ppDataPeriodArr.length; i++) {
+        for (let j=0; j<productsArrList.length; j++) {
+            graphData[j][i] = ppQuantitiesDays[i][j];
+        }
+        k += 1;
+    }
+    console.log(`31 first: ${first}, second: ${second}`);
+    console.log("31 typeof graphData: ", typeof graphData);
+    console.log("31 graphData: ", graphData);
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 32. 날짜별 생산 실적 수량.goodnesscumsum.
+    // arr[5][2] (빈 배열 생성)
+    // Arry 객체에 배열생성함수를 추가하여 2차원 배열을 생성하는 방법
+    Array.matrix2 = function (m, n, initial) {
+        var a, i, k, mat2 = [];
+        for (i = 0; i < m; i += 1) {
+            a = [];
+            for (k = 0; k < n; k += 1) {
+                a[k] = initial;
+            }
+            mat2[i] = a;
+        }
+        return mat2;
+    };
+
+    // matrix(행, 열, 기본값)
+    {#let first = ppDataPeriodArr.length;#}
+    {#let second = productsArr.length;#}
+    var ppVolumesDays = Array.matrix2(first, second, 0);
+
+    var k = 0;
+    var ppVolumes = [];
+    for (let i = 0; i < ppDataArr2.length; i++) {
+        var rows = ppDataArr2[i];
+        //console.log("31 rows: ", rows);
+        rows = rows.replace(/Decimal/gi,"");
+        //console.log("32 rows: ", rows);
+        rows = rows.replace(/[\{\}\[\]\(\)\'\"\?\*]/gi,""); // [빽슬러쉬+특수문자] 형태로 적어줘야 한다...
+        //rows = rows.replace(/[\{\}\(\)\'\"\?\*]/gi,""); // [빽슬러쉬+특수문자] 형태로 적어줘야 한다...
+        rows = rows.replace(/.0000/gi,"");
+        //console.log("40 rows.length: ", rows.length);
+        //console.log("40 typeof rows: ", typeof rows);
+        //console.log("40 rows: ", rows);
+
+        var ppVolumes = rows.split(",");
+        //console.log("50 ppQuantities: ", ppQuantities);
+
+        // 여기서는 날짜별 생산 수량을 모으는 것이고, 아래에서 다시 [제품별] 생산 수량 리스트를 반드시 만들어야 한다.
+        for (let j = 1; j < ppVolumes.length; j++) {
+            ppVolumesDays[i][j-1] = Number(ppVolumes[j]);
+        }
+
+    }
+
+    // 여기서 다 [제품별] 생산 수량 리스트를 반드시 만들어야 한다. 이넘이 실제로 그래프에서 사용할 수 있는 [data] 임에 주의.
+    var k = 0;
+    var graphData2 = Array.matrix(second, first, 0);
+    for (let i = 0; i < ppDataPeriodArr.length; i++) {
+        for (let j = 0; j < productsArrList.length; j++) {
+            //console.log("71 ppVolumesDays[i][j]: *****", ppVolumesDays[i][j]);
+            graphData2[j][i] = ppVolumesDays[i][j];
+            //console.log("71 typeof graphData2[j][i]: ", typeof graphData2[j][i]);
+            //console.log(`71 i: ${j}, j: ${i}, graphData2[j]: ${graphData2[j]}`);
+        }
+        k += 1;
+    }
+    console.log(`32 first: ${first}, second: ${second}`);
+    console.log("32 typeof graphData2: ", typeof graphData2);
+    console.log("43 graphData2: ", graphData2);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 33. 월간 생산 계획 수량.planqty.
+    // arr[5][2] (빈 배열 생성)
+    // Arry 객체에 배열생성함수를 추가하여 2차원 배열을 생성하는 방법
+    Array.matrix3 = function (m, n, initial) {
+        var a, i, k, mat2 = [];
+        for (i = 0; i < m; i += 1) {
+            a = [];
+            for (k = 0; k < n; k += 1) {
+                a[k] = initial;
+            }
+            mat2[i] = a;
+        }
+        return mat2;
+    };
+
+    // matrix(행, 열, 기본값)
+    {#let first = ppDataPeriodArr.length;#}
+    {#let second = productsArr.length;#}
+    var ppVolumesDays = Array.matrix3(first, second, 0);
+
+    var k = 0;
+    var ppVolumes = [];
+    for (let i = 0; i < ppDataArr3.length; i++) {
+        var rows = ppDataArr3[i];
+        //console.log("31 33 rows: ", rows);
+        rows = rows.replace(/Decimal/gi,"");
+        //console.log("32 33 rows: ", rows);
+        rows = rows.replace(/[\{\}\[\]\(\)\'\"\?\*]/gi,""); // [빽슬러쉬+특수문자] 형태로 적어줘야 한다...
+        //rows = rows.replace(/[\{\}\(\)\'\"\?\*]/gi,""); // [빽슬러쉬+특수문자] 형태로 적어줘야 한다...
+        rows = rows.replace(/.0000/gi,"");
+        //console.log("40 33 rows.length: ", rows.length);
+        //console.log("40 33 typeof rows: ", typeof rows);
+        //console.log("40 33 rows: ", rows);
+
+        var ppVolumes = rows.split(",");
+        //console.log("50 33 ppQuantities: ", ppQuantities);
+
+        // 여기서는 날짜별 생산 수량을 모으는 것이고, 아래에서 다시 [제품별] 생산 수량 리스트를 반드시 만들어야 한다.
+        for (let j = 1; j < ppVolumes.length; j++) {
+            ppVolumesDays[i][j-1] = Number(ppVolumes[j]);
+        }
+
+    }
+
+    // 여기서 다 [제품별] 생산 수량 리스트를 반드시 만들어야 한다. 이넘이 실제로 그래프에서 사용할 수 있는 [data] 임에 주의.
+    var k = 0;
+    var graphData3 = Array.matrix(second, first, 0);
+    for (let i = 0; i < ppDataPeriodArr.length; i++) {
+        for (let j = 0; j < productsArrList.length; j++) {
+            //console.log("71 ppVolumesDays[i][j]: *****", ppVolumesDays[i][j]);
+            graphData3[j][i] = ppVolumesDays[i][j];
+            //console.log("71 33 typeof graphData2[j][i]: ", typeof graphData2[j][i]);
+            //console.log(`71 33 i: ${j}, j: ${i}, graphData2[j]: ${graphData2[j]}`);
+        }
+        k += 1;
+    }
+    console.log(`32 33 first: ${first}, second: ${second}`);
+    console.log("32 33 typeof graphData2: ", typeof graphData3);
+    console.log("43 33 graphData2: ", graphData3);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    // 아래는 <table> 태그에 넣을 [합계] 수량...
+    {#console.log("33 ppQuantitiesDays: ", ppQuantitiesDays);#}
+    {#console.log("29 ppDataPeriodProcessListArr: ", ppDataPeriodProcessListArr);#}
+
+    {#console.log("process.py productsArrList.length: ", productsArrList.length);#}
+    {#console.log("process.py processCodeCurrent.length: ", processCodeCurrent.length);#}
+
+
+</script>
+
+{#{% endblock %}#}
+

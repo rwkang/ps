@@ -1,0 +1,70 @@
+{% block table_pp_data %}
+{% load humanize %}
+<a class="btn btn-primary  btn-sm btn-block" href="">생산 능력 정보</a>
+<div class="table-responsive mt-2">
+    <!-- <table class="table table-sm"> -->
+    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+        <thead>
+        <tr>
+            {#<th>라인</th>#}
+            <th>라인명</th>
+            <!--<th>라인명</th>-->
+            <!--<th>작업일수</th>: [제품별]이 아니기 때문에 절대 [CT]가 올 수 없다-->
+            <!--<th>CT/UPH</th>-->
+            <th>계획 수량</th>
+            <th>소요시간</th>
+            <th>소요일수(8h/10h/12h)</th>
+            <!--<th>초재고</th>-->
+            <th>가동률</th>
+            <!--<th>능력 수량.CAPABILITY</th>: 이것도 불가능하며 전혀 의미가 없다. 설비에 2개 이상의 품목을 생산할 수 있기에-->
+            {#            <th>수정</th>#}
+            {#            <th>삭제</th>#}
+        </tr>
+        </thead>
+        <tfoot>
+        <tr class="titlerow">
+            {#<th>라인</th>#}
+            <th>라인명</th>
+            <!--<th>라인명</th>-->
+            <!--<th>작업일수</th>-->
+            <!--<th>CT/UPH</th>: [제품별]이 아니기 때문에 절대 [CT]가 올 수 없다-->
+            <!--<th>소요시간</th>-->
+            <th style="text-align: right" id="currentPageTotal"></th>
+            <th style="text-align: right" id="processTotal"></th>
+            <th>소요일수(8h/10h/12h)</th>
+            <!--<th>초재고</th>-->
+            <th style="text-align: right" id="availabilityProcessTotal"></th>
+            <!--<th>능력 수량</th>-->
+            <!--<th>계획 수량</th>-->
+            <!--<th>공정</th>-->
+        </tr>
+        </tfoot>
+        <tbody id="tableBody">
+        {% csrf_token %}
+        {#{% for row in sqlQuerySets %}: [sqlQuerySets]은 제품 정보까지 담겨진 원본 쿼리임에 주의#}
+        {% for row in jsonCapacity %}
+            <tr>
+                {# <td>{{ row.3|truncatewords:40 }}</td> #}
+                {# <td align="right" class="capacityHour8">{{ row.capacityHour8 |floatformat:0|intcomma }}</td> #}
+                {{ getLanguage }}
+                {#<td align="center">{{ row.machine }}</td>#}
+                {% if LANGUAGE_NO == 1042 %}
+                    <td>{{ machine }} {{ row.machine_ko }}</td>
+                {% else %}
+                    <td>{{ machine }} {{ row.machine_lo }}</td>
+                {% endif %}
+                <td align="right" class="dpt">{{ row.dpt|floatformat:0|intcomma }}</td>
+                {#<!--<td align="right" class="needshour">{{ row.needshour |floatformat:0|intcomma }}h / {{  }}d</td>-->#}
+                <td align="right" class="needshour">{{ row.needshour |floatformat:0|intcomma }}h</td>
+                <td align="right" class="needshour">{{ row.needsdays8 }}    ( {{ row.needsdays10 }} / {{ row.needsdays12 }})일</td>
+                <td align="right" class="availability8">{{ row.availability8 |floatformat:1|intcomma }}%</td>
+                {#                <td><a class="btn btn-sm btn-info" href="">수정</a> </td>#}
+                {#                <td><a class="btn btn-sm btn-danger" href="">삭제</a> </td>#}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}
+

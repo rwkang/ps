@@ -1,0 +1,1335 @@
+{% extends 'ppp/index.html' %}
+{% load static %}
+
+<!-- 아래 내용은 모두 index.html 파일에서 처리하기 때문에, 여기서는 의미가 없다... -->
+
+<!-- <h1>공정별 생산 분석</h1> -->
+{#    context = {'process': process, 'finalrep_dict': finalrep_dict, 'total_pp_data_count': total_pp_data_count}#}
+
+{% block contentChart2 %}
+    {#    <table class="ppData" hidden="hidden">#}
+    <table class="ppData">
+        <tbody>
+        {% for values in rsListSum %}
+            <p>{{ values }}</p>
+            <div>
+{#                <input value=rsDictSum type="text" id="rsDictSum">#}
+            </div>
+
+            {% for val in values %}
+                <li>{{ val }}</li>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {#    {% for row in process %}#}
+    {#        <h1>공정은 {{ row.0 }} {{ row.2 }}</h1>#}
+    {#    {% endfor %}#}
+    {#    <h1>{{ rsDictSum }}</h1>#}
+    {#    {% for keys, values in rsDictSum.items %}#}
+    {#        <li>{{ keys }} : {{ values }}</li>#}
+    {#        <td>{{ keys }} : </td>#}
+    {#        {% for key, val in values.items %}#}
+    {#            <li>{{ key }} : {{ val }}</li>#}
+    {#        {% endfor %}#}
+    {#    {% endfor %}#}
+
+    <canvas id="myChartBarProduct" height="300"></canvas>
+
+    {#    <script src="{% static 'js/pp_product_analysis.js' %}"></script>#}
+
+    <script>
+
+    var tdDays = document.querySelector('#tdDays').innerHTML;
+        console.log("2 typeof tdDays: ", typeof tdDays);
+        console.log("2 tdDays: ", tdDays);
+
+        {#var ppDataHtml = document.querySelector('#ppDataHtml');#}
+        {#console.log("1 typeof ppDataHtml: ", typeof ppDataHtml);#}
+        {#console.log("1 ppDataHtml: ", ppDataHtml);#}
+        {##}
+        {#var ppDataHtmlObj = Object.values(ppDataHtml);#}
+        {#console.log("11 typeof ppDataHtmlObj: ", typeof ppDataHtmlObj);#}
+        {#console.log("11 ppDataHtmlObj: ", ppDataHtmlObj);#}
+
+
+
+
+
+
+        {#var ppDataHtml = document.querySelector('#ppDataHtml').innerHTML;#}
+        {#console.log("2 typeof ppDataHtml: ", typeof ppDataHtml);#}
+        {#console.log("2 ppDataHtml: ", ppDataHtml);#}
+        {##}
+        {#var process = '{{ process | escapejs}}';#}
+        {#var bbb = '{{ process }}';#}
+        {#console.log("2 typeof process: ", typeof process);#}
+        {#console.log("2 process: ", process);#}
+        {##}
+        {#var processArr = process.split("),");#}
+        {#console.log("2 typeof processArr: ", typeof processArr);#}
+        {#console.log("2 process: ", processArr);#}
+        {##}
+        {#var processObj = Object.values(processArr);#}
+        {#console.log("2 typeof processObj: ", typeof processObj);#}
+        {#console.log("2 processObj: ", processObj);#}
+
+
+
+
+
+
+        var ppData = '{{ ppData | escapejs}}';
+        console.log("21 typeof ppData: ", typeof ppData);
+        console.log("21 ppData: ", ppData);
+
+        {#var ppDataArr = ppData.split(")],");#}
+        var ppDataArr = ppData.split(",");
+        console.log("22 ppDataArr.length: ", ppDataArr.length);
+        console.log("22 typeof ppDataArr: ", typeof ppDataArr);
+        console.log("22 ppDataArr: ", ppDataArr);
+
+        {#var ppDataArrObj = Object.values(ppDataArr);#}
+        {#console.log("333 ppDataArrObj.length: ", ppDataArrObj.length);#}
+        {#console.log("333 typeof ppDataArrObj: ", typeof ppDataArrObj);#}
+        {#console.log("333 ppDataArrObj: ", ppDataArrObj);#}
+
+        var ppDays = [];
+        var ppProducts = [];
+        var ppQuantities = [];
+        for (var i = 0; i < ppDataArr.length; i++) {
+            var fromSingleQuotation = ppDataArr[i].indexOf("'");
+            console.log("22 ppDataArr.length: ", ppDataArr.length);
+            console.log("22 i: ", i);
+            console.log("22 fromSingleQuotation: ", fromSingleQuotation);
+            console.log("22 ppDataArr[i]: ", ppDataArr[i]);
+            var toSingleQuotation = ppDataArr[i].indexOf("'", fromSingleQuotation + 1);
+            console.log("22 toSingleQuotation: ", toSingleQuotation);
+
+            var remainder = i % 3;
+            if (remainder === 0) {
+                {#ppDays += ppDataArr[i];#}
+                ppDays.push(ppDataArr[i].substring(fromSingleQuotation, toSingleQuotation + 1));
+            } else if (remainder === 1) {
+                {#ppProducts += ppDataArr[i];#}
+                ppProducts.push(ppDataArr[i].substring(fromSingleQuotation, toSingleQuotation + 1));
+            } else {
+                {#ppQuantities += ppDataArr[i];#}
+                ppQuantities.push(ppDataArr[i].substring(fromSingleQuotation, toSingleQuotation + 1));
+            }
+        };
+        console.log("222 typeof ppDays: ", typeof ppDays);
+        console.log("222 ppDays: ", ppDays);
+        console.log("222 typeof ppProducts: ", typeof ppProducts);
+        console.log("222 ppProducts: ", ppProducts);
+        console.log("222 typeof ppQuantities: ", typeof ppQuantities);
+        console.log("222 ppQuantities: ", ppQuantities);
+
+
+
+        {#var ppDataCount = Number('{{ ppDataCount | escapejs }}');#}
+        {#var ppDays#}
+        {#var ppProducts#}
+        {#var ppQuantities#}
+        {#var ppRows#}
+        {#var ppRowsArr#}
+        {#for (var i = 0; i < ppDataCount; i++) {#}
+        {#    var ppRows = ppDataArr[i];#}
+        {#    var ppRowsArr = ppRows.split("),");#}
+        {#    console.log("222 typeof ppRowsArr: ", typeof ppRowsArr);#}
+        {#    console.log("222 ppRows: ", ppRowsArr);#}
+        {#}#}
+
+
+        {#var rsTupleSum = '{{ rsTupleSum | escapejs }}';#}
+        {#console.log("31 typeof rsTupleSum: ", typeof rsTupleSum);#}
+        {#console.log("31 rsTupleSum: ", rsTupleSum);#}
+        {##}
+        {#var rsTupleSumArr = rsTupleSum.split(")),");#}
+        {#console.log("32 typeof rsTupleSumArr: ", typeof rsTupleSumArr);#}
+        {#console.log("32 rsTupleSumArr: ", rsTupleSumArr);#}
+
+
+
+
+
+
+        {#var processJson = '{{ processJson | escapejs}}';#}
+        {#console.log("2 typeof processJson: ", typeof processJson);#}
+        {#console.log("2 processJson: ", processJson);#}
+
+        {#var processParse = JSON.parse("{{ processJson|escapejs }}");#}
+{#        var processParse = {};#}
+{#        processParse = processParse.push(processParse);#}
+{#        console.log("1 typeof processParse: ", typeof processParse);#}
+{#        console.log("1 processParse: ", processParse);#}
+{#        processParse = JSON.parse('{process}');#}
+{#        console.log("2 typeof processParse: ", typeof processParse);#}
+{#        console.log("2 processParse: ", processParse);#}
+{##}
+{##}
+{#        var ppDataHtml ={};#}
+        {#ppDataHtml = document.querySelector('#ppDataHtml').value(); 이건 에러...#}
+{#        ppDataHtml = document.querySelector('#ppDataHtml');#}
+{#        console.log("typeof ppDataHtml: ", typeof ppDataHtml);#}
+{#        console.log("ppDataHtml: ", ppDataHtml);#}
+
+        {#for (var i = 0; i < 3; i++) {#}
+            {#var ppDataHtmlDays = ppDataHtml[i]; <!-- 여기서 에러... -->#}
+            {#console.log("ppDataHtmlDays: ", ppDataHtmlDays)#}
+        {#}#}
+        {##}
+        {#var ppDataSetQuery = '{{ pp_data_period_process | escapejs}}';#}
+        {#console.log("typeof ppDataSetQuery: ", typeof ppDataSetQuery);#}
+        {#console.log("ppDataSetQuery: ", ppDataSetQuery);#}
+        {##}
+        {##}
+        {#let s = new dfd.Series([20, 21, 22, 23]);#}
+        {#s.print();#}
+        {##}
+        {#df = new dfd.DataFrame({#}
+        {#    '날짜': ['2020.12.01', '2020.12.02', '2020.12.03'],#}
+        {#    '제품': ['CN7CG', 'CN7CK', 'NU'],#}
+        {#    '수량': [175, 1259, 35]#}
+        {#});#}
+        {#df.print();#}
+
+        {#df = new dfd.DataFrame('{{ pp_data_period_process | escapejs }}');#}
+        {#df = new dfd.DataFrame('{{ ppData | escapejs }}');#}
+        {#df.print();#}
+
+
+        {#var process = '{{ process | escapejs}}';#}
+        {#var bbb = '{{ process }}';#}
+        {#console.log("2 typeof process: ", typeof process);#}
+        {#console.log("2 process: ", process);#}
+        {##}
+        {#var dfProcess = '{{ df_process | escapejs}}';#}
+        {#console.log("2 typeof dfProcess: ", typeof dfProcess);#}
+        {#console.log("2 dfProcess: ", dfProcess);#}
+        {##}
+        {#var dfProcessArr = dfProcess.split("\n");#}
+        {#console.log("3 typeof dfProcessArr: ", typeof dfProcessArr);#}
+        {#console.log("3 dfProcessArr: ", dfProcessArr);#}
+
+        {#dfProcess.forEach(function (item, index, arr2) {#}
+        {#    console.log(item, index, arr2[index+1]);#}
+        {#})#}
+
+        {#var table#}
+        {#dfProcess.tableToJSON().then(function (data) {#}
+        {#    data.print();#}
+        {#});#}
+        {#var table = document.querySelector(#ppDataTable).tableToJSON();#}
+        {#console.log("table: ", table);#}
+
+
+
+        {#dfd.read_json('{{ process | escapejs }}').then(function (data) {#}
+        {#    data.print();#}
+        {#})#}
+        {#df.print();#}
+
+
+        {#var process = htmlDecode(process);#}
+        {#console.log("2 typeof process: ", typeof process);#}
+        {#console.log("2 process: ", process);#}
+        {##}
+        {#var dfProcess = htmlDecode(dfProcess);#}
+        {#console.log("2 typeof dfProcess: ", typeof dfProcess);#}
+        {#console.log("2 dfProcess: ", dfProcess);#}
+
+        {#df = new dfd.DataFrame('{{ process | escapejs }}');#}
+        {#df.print();#}
+
+        {#console.log("2 process.0: ", '{{ process.0 | escapejs}}');#}
+        {#console.log("2 process.0.0: ", '{{ process.0.0 | escapejs}}');#}
+        {##}
+        {#var ppData = {}#}
+        {#ppData = '{{ ppData | escapejs}}';#}
+        {#console.log("1 ppData: ", ppData);#}
+        {##}
+        {#var ppDataJson = JSON.stringify(ppData);#}
+        {#console.log("1 ppDataJson: ", ppDataJson);#}
+        {#console.log("1 typeof ppDataJson: ", typeof ppDataJson);#}
+
+        {#var trDays = htmlDecode(#trDays);#}
+
+        {#var thDays = document.querySelector(#thDays);#}
+        {#console.log("thDays: ", thDays);#}
+
+        {#var thProducts = document.querySelector(#thProducts);#}
+        {#var thQuantities = document.querySelector(#thQuantities);#}
+        {#var tdDays = document.querySelector(#tdDays);#}
+        {#var tdProducts = document.querySelector(#tdProducts);#}
+        {#var tdQuantities1 = document.querySelector(#tdQuantities);#}
+        {#console.log("tdQuantities1: ", tdQuantities1);#}
+
+
+        {#df = new dfd.DataFrame({#}
+        {#    '날짜': ['{{ ppData.0 | escapejs }}'],#}
+        {#    '제품': ['{{ ppData.1 | escapejs }}'],#}
+        {#    '수량': ['{{ ppData.2 |escapejs }}']#}
+        {#});#}
+        {#df.print();#}
+
+
+        {#df = new dfd.DataFrame('{{ pp_data_period_process }}')#}
+
+
+        {#var table = $(#ppDataTable).tableToJSON();#}
+        {#var table = document.querySelector(#ppDataTable).tableToJSON();#}
+        {#console.log("table: ", table);#}
+
+
+        {#console.log("aaa");#}
+        {##}
+        {#var obj = new Object(ppDataHtml);#}
+        {#console.log("typeof obj: ", typeof obj);#}
+        {#console.log("obj: ", obj);#}
+        {##}
+        {#var ppData = '{{ ppData | escapejs}}'#}
+        {#console.log("typeof ppData: ", typeof ppData);#}
+        {#console.log("ppData: ", ppData)#}
+
+        {#var objectValues = rec.json;#}
+        {#for ( var key in objectValues) {#}
+        {#    console.log("attr: ", key, ", value: ", objectValues[key]);#}
+        {#}#}
+
+
+
+
+
+
+
+{#        <script type="module">#}
+{#        import {isArray} from "../../ref_data/Chart.js-master/src/helpers";#}
+
+        {#var ppDataHtml ={};#}
+        {#ppDataHtml = document.querySelector('#ppDataHtml').value(); 이건 에러...#}
+        {#ppDataHtml = document.querySelector('#ppDataHtml');#}
+        {#console.log("typeof ppDataHtml: ", typeof ppDataHtml);#}
+        {#console.log("ppDataHtml: ", ppDataHtml);#}
+        {##}
+        {#console.log("aaa");#}
+        {#console.log("ppDataHtml: ", ppDataHtml.toString());#}
+        {##}
+        {#var obj = new Object(ppDataHtml);#}
+        {#console.log("typeof obj: ", typeof obj);#}
+        {#console.log("obj: ", obj);#}
+        {##}
+        {#var ppData = '{{ ppData | escapejs}}'#}
+        {#console.log("typeof ppData: ", typeof ppData);#}
+        {#console.log("ppData: ", ppData)#}
+
+        {#var objectValues = rec.json;#}
+        {#for ( var key in objectValues) {#}
+        {#    console.log("attr: ", key, ", value: ", objectValues[key]);#}
+        {#}#}
+
+        {#var obj = new Object(ppData);#}
+        {#console.log("typeof obj: ", typeof obj);#}
+        {#console.log("obj: ", obj)#}
+
+
+        {#if (ppData.isArray) {#}
+        {#    console.log("true");#}
+        {#} else {#}
+        {#    console.log("false");#}
+        {#};#}
+
+
+        {#Object.setPrototypeOf(ppData);#}
+        {#Array.isArray(ppData);#}
+
+        {#let newList = [];#}
+        {#for (let i = 0; i < 3; i++) {#}
+        {#    newList.push(ppData[i]);#}
+        {#}#}
+        {#console.log("newList: ", newList);#}
+
+
+
+        {#for(const [key, values] of Object.entries(ppData)) {#}
+        {#    console.log(`${key}: ${values}`);#}
+        {#    console.log(`values: `, values);#}
+        {#    console.log("aaa");#}
+        {#}#}
+
+        {#for(var values in ppData) {#}
+        {#    console.log(`values: `, values);#}
+        {#    console.log("aaa");#}
+        {#}#}
+
+        {#ppData.forEach(function(values) {#}
+        {#    console.log("values: ", values);#}
+        {#})#}
+
+        {#var daysValues ={};#}
+        {#daysValues = document.querySelector('#days').value(); 이건 에러...#}
+        {#daysValues = document.querySelector('#days');#}
+        {#console.log("typeof daysValues: ", typeof daysValues);#}
+        {#console.log("daysValues: ", daysValues);#}
+
+        {#for (i = 0; i < daysValues.length; i++) {#}
+        {#    var daysCurr = daysValues[0];#}
+        {#    for (j = 0; j < daysValues)#}
+        {#}#}
+
+        {#function htmlDecode(str) {#}
+        {#    const doc = new DOMParser().parseFromString(str, "text/html");#}
+        {#    return doc.documentElement.textContent;#}
+        {#}#}
+        {#document.getJSON("process.html", function (data) {#}
+        {#    document.getElementById('#rsValues').text(htmlDecode(data.rsValues));#}
+        {#    var ttt = document.getElementById('#rsValues').text(htmlDecode(data.rsValues));#}
+        {#});#}
+
+        {#var bbb = '{{ process | escapejs}}';#}
+        {#var bbb = '{{ process }}';#}
+        {#var ggg = htmlDecode(bbb);#}
+        {#console.log("2 typeof ggg: ", typeof ggg);#}
+        {#console.log("2 ggg: ", ggg);#}
+        {#console.log("2 process.0: ", '{{ process.0 | escapejs}}');#}
+        {#console.log("2 process.0.0: ", '{{ process.0.0 | escapejs}}');#}
+        {##}
+        {#var ppData = {}#}
+        {#ppData = '{{ ppData | escapejs}}';#}
+        {#console.log("1 ppData: ", ppData);#}
+        {##}
+        {#var ppDataJson = JSON.stringify(ppData);#}
+        {#console.log("1 ppDataJson: ", ppDataJson);#}
+        {#console.log("1 typeof ppDataJson: ", typeof ppDataJson);#}
+        {##}
+        {#console.log("1 ppData[0]: ", ppData[0]);#}
+        {#console.log("1 ppData[1]: ", ppData[1]);#}
+
+
+
+        {#console.log("1 ppData.0: ", ppData[0]);#}
+        {#console.log("1 ppData.0.0: ", ppData[0.0]);#}
+
+        {#var ppData = htmlDecode(ppData);#}
+        {#console.log("1 typeof ppData: ", typeof ppData);#}
+        {##}
+        {#console.log("2 ppData.0: ", '{{ ppData.0 | escapejs}}');#}
+        {#console.log("2 ppData.0.0: ", '{{ ppData.0.0 | escapejs}}');#}
+        {##}
+        {#var ppDataCount = Number('{{ ppDataCount | escapejs }}');#}
+
+
+
+        {#var ppData = '{{ ppDataCount | escapejs }}';#}
+        {#var days = {};#}
+        {#var products = {};#}
+        {#var quantities = {};#}
+        {#for (var i = 0; i < ppDataCount; i++){#}
+        {#    for (var j = 0; j < 3; j++) {#}
+                {#var dayCurr = '{{ ppData.0.0 | escapejs}}';#}
+                {#var productCurr = '{{ ppData.0.1 | escapejs}}';#}
+                {#var goodnessCurr = '{{ ppData.0.2 | escapejs }}';#}
+        {##}
+                {#var dayCurr = "{{ ppData.0." + string(j) + ' | escapejs}}";#}
+        {#        var dayCurr = `{{ ppData.0.0 | escapejs}}`;#}
+        {#        var dayCurr = `{{ ppData.${i}.0 | escapejs}}`;#}
+        {#        var productCurr = '{{ ppData.0.1 | escapejs}}';#}
+        {#        var goodnessCurr = '{{ ppData.0.2 | escapejs }}';#}
+        {#        console.log("2 dayCurr: ", dayCurr);#}
+        {#        console.log("2 productCurr: ", productCurr);#}
+        {#        console.log("2 goodnessCurr: ", goodnessCurr);#}
+        {##}
+        {#        days += dayCurr;#}
+        {#        products += productCurr;#}
+        {#        quantities += goodnessCurr;#}
+        {#    }#}
+        {#}#}
+        {#console.log("2 days: ", days);#}
+        {#console.log("2 products: ", products);#}
+        {#console.log("2 quantities: ", quantities);#}
+
+
+
+        {#var bbb = '{{ rsListSum | escapejs}}';#}
+        {#var ggg = htmlDecode(bbb);#}
+        {#console.log("1 typeof ggg: ", typeof ggg);#}
+        {#console.log("1 ggg: ", ggg);#}
+        {#list.리스트로는 못 가져오네. 에러는 안 나는데...#}
+        {#console.log("2 rsListSum.0: ", '{{ rsListSum.0 | escapejs}}');#}
+        {#console.log("2 rsListSum.0.0: ", '{{ rsListSum.0.0 | escapejs}}');#}
+        {#console.log("2 rsListSum.0.0.0: ", '{{ rsListSum.0.0.0 | escapejs}}');#}
+        {#console.log("2 total_pp_data_count: ", '{{ total_pp_data_count | escapejs}}');#}
+
+
+
+
+
+
+
+
+        {#var bbb = '{{ rsDictSum | escapejs}}';#}
+        {#var ggg = htmlDecode(bbb);#}
+        {#console.log("1 typeof ggg: ", typeof ggg);#}
+        {#console.log("1 ggg: ", ggg);#}
+        {#dictionary.딕셔너리로는 못 가져오네. 에러는 안 나는데...#}
+        {#console.log("2 rsDictSum.0: ", '{{ rsDictSum.0 | escapejs}}');#}
+        {#console.log("2 rsDictSum.0.0: ", '{{ rsDictSum.0.0 | escapejs}}');#}
+
+        {#아래 for 문으로는 못 가져오네. 에러는 안 나는데...#}
+        {#console.log("1 rsDictSum: ", {% for i in rsDictSum %}'{{ rsDictSum | escapejs}}'{% endfor %});#}
+        {#console.log("1 i: ", {% for i in rsDictSum %}'{{ i | escapejs}}'{% endfor %});#}
+
+
+
+
+
+
+        {#아래 for 문으로는 못 가져오네. 에러는 안 나는데...#}
+        {#console.log("1 rsDictSum: ", {% for i in rsDictSum %}'{{ rsDictSum | escapejs}}'{% endfor %});#}
+        {#console.log("1 i: ", {% for i in rsDictSum %}'{{ i | escapejs}}'{% endfor %});#}
+
+        {#var processCode#}
+        {#for (var i=0; i < 4; i++){#}
+        {#    processCode += ggg['day1']#}
+        {#}#}
+        {#console.log("2 processCode: ", processCode);#}
+
+        {#var bbb = '{{ pp_data_period_process | escapejs}}';#}
+        {#var ggg = htmlDecode(bbb);#}
+        {#console.log("1 typeof ggg: ", typeof ggg);#}
+        {#console.log("1 ggg: ", ggg);#}
+        {##}
+        {#var processCode#}
+        {#for (var i=0; i < 4; i++){#}
+        {#    processCode += ggg[0]#}
+        {#}#}
+        {#console.log("2 processCode: ", processCode);#}
+
+        {#var bbb = '{{ rsTupleSum | escapejs}}';#}
+        {#var ggg = htmlDecode(bbb);#}
+        {#console.log("2 typeof ggg: ", typeof ggg);#}
+        {#console.log("2 ggg: ", ggg);#}
+
+        {#var bbb = '{{ rsListSum | escapejs}}';#}
+        {#var ggg = htmlDecode(bbb);#}
+        {#console.log("3 typeof ggg: ", typeof ggg);#}
+        {#console.log("3 ggg: ", ggg);#}
+
+        {#var processCode#}
+        {#for (var i=0; i < 4; i++){#}
+        {#    processCode += ggg[0]#}
+        {#}#}
+        {#console.log("2 processCode: ", processCode);#}
+
+        {#아래는 html Object 형식으로 변환되고, 그 값은 body 태그에 저장이 되네...#}
+        {#var aaa = '{{ rsDictSum | escapejs }}';#}
+        {#var ttt = {}#}
+        {#ttt = new DOMParser().parseFromString(aaa, 'text/html');#}
+        {#console.log("1 typeof ttt: ", typeof ttt);#}
+        {#console.log("1 ttt: ", ttt);#}
+
+        {#아래는 html Object 형식으로 변환되고, 그 값은 body 태그에 저장이 되네...#}
+        {#var aaa = '{{ process | escapejs }}';#}
+        {#var ttt = {}#}
+        {#ttt = new DOMParser().parseFromString(aaa, 'text/html');#}
+        {#console.log("1 typeof ttt: ", typeof ttt);#}
+        {#console.log("1 ttt: ", ttt);#}
+
+        {#var processCode#}
+        {#for (var i=0; i < 4; i++){#}
+        {#    processCode += ttt[1]#}
+        {#}#}
+        {#console.log("2 processCode: ", processCode);#}
+        {##}
+        {#var processCode#}
+        {#for (var i=0; i < 4; i++){#}
+        {#    processCode += ttt[0]#}
+        {#}#}
+        {#console.log("2 processCode: ", processCode);#}
+        {##}
+        {#var bbb = "{{ rsTupleSum | escapejs}}";#}
+        {#var ggg = htmlDecode(bbb);#}
+        {#console.log("2 typeof ggg: ", typeof ggg);#}
+        {#console.log("2 ggg: ", ggg);#}
+        {##}
+        {#var aaa = '{{ rs_TupleSum | escapejs }}'#}
+        {#console.log("aaa: ", aaa)#}
+        {##}
+        {#var kkk = []#}
+        {#function getToData(toData) {#}
+        {#    for (var i=0; i<112; i++){#}
+        {#        kkk += ggg[2]#}
+        {#    }#}
+        {#    return kkk#}
+        {#}#}
+        {#var kk = getToData(ggg)#}
+        {#console.log("kk: ", kk)#}
+        {##}
+        {#function getToData2(toData) {#}
+        {#    var rowData = {}#}
+        {#    for (var i=0; i<112; i++){#}
+        {#        rowData += ggg[2]#}
+        {#    }#}
+        {#    return rowData#}
+        {#}#}
+        {#var rowData = getToData2(ggg)#}
+        {#console.log("rowData: ", rowData)#}
+
+
+
+
+        {#var aaa = {% for i in rsTupleSum | escapejs %}'{{ i.0 }}'{% endfor %}#}
+        {#console.log("aaa: or i in rsTupleSum | escapejs %}'{{ i.0 }}'{% endfor %}#}
+        {#console.log("aaa: ", aaa)#}
+
+
+        {#console.log("2 ttt: ", ttt);#}
+
+        {#console.log("2 rsTupleSum: ", '{{ rsTupleSum }}')#}
+
+        {#var process = '{{ process }}'#}
+        {#console.log("2 typeof process: ", typeof process)#}
+        {#console.log("2 process: ", '{{ process }}')#}
+
+        {#var bbb = []#}
+        {#bbb = [{% for i in process %}'{{ i.1 }}'{% endfor %}]#}
+        {#console.log("2 typeof bbb: ", typeof bbb)#}
+        {#console.log("2 bbb: ", bbb)#}
+
+        {#var bbb = []#}
+        {#bbb = [{% for i in process %}'{{ process }}'{% endfor %}]#}
+        {#console.log("2 typeof bbb: ", typeof bbb)#}
+        {#console.log("2 bbb: ", bbb)#}
+
+
+
+        {#var rsListSum#}
+        {#rsListSum = '{{ rsListSum }}'#}
+        {#console.log("2 typeof rsListSum: ", typeof rsListSum)#}
+        {#console.log("2 rsListSum: ", '{{ rsListSum }}')#}
+        {##}
+        {#var rsTupleSum#}
+        {#rsTupleSum = '{{ rsTupleSum }}'#}
+        {#console.log("2 typeof rsTupleSum: ", typeof rsTupleSum)#}
+        {#console.log("2 rsTupleSum: ", '{{ rsTupleSum }}')#}
+        {##}
+        {#var rsDictSum#}
+        {#rsDictSum = '{{ rsDictSum }}'#}
+        {#console.log("2 typeof rsDictSum: ", typeof rsDictSum)#}
+        {##}
+
+        {#var ccc = []#}
+        {#ccc = [{% for i in process %}'{{ process }}'{% endfor %}]#}
+        {#console.log("2 typeof ccc: ", typeof ccc)#}
+        {#console.log("2 ccc: ", ccc)#}
+
+        {#var ccc = []#}
+        {#ccc = [{% for i in rsListSum %}'{{ rsListSum }}'{% endfor %}]#}
+        {#console.log("2 typeof ccc: ", typeof ccc)#}
+        {#console.log("2 ccc: ", ccc)#}
+
+        {#var aaa = []#}
+        {#aaa = [{% for i in rsTupleSum %}'{{ i.0.1 }}'{% endfor %}]#}
+        {#console.log("2 typeof aaa: ", typeof aaa)#}
+        {#console.log("2 aaa: ", typeof aaa)#}
+
+        {#console.log("2 process: ", '{{ process }}')#}
+        {#console.log("2 process: ", '{{ process }}')#}
+
+
+
+
+
+
+
+
+
+
+        {#console.log("1 LANGUAGE_NO: ")#}
+        {#var aaa = {{ LANGUAGE_NO }}#}
+        {#console.log("2 LANGUAGE_NO: ", {{ LANGUAGE_NO }})#}
+        {#var bbb = {{ total_pp_data_count }}#}
+        {#console.log("2 total_pp_data_count: ", {{ total_pp_data_count }})#}
+
+        {#var ccc = {}#}
+        {#ccc = {% for p in process %}'{{ p.0 }}' {% endfor %}#}
+        {#console.log("2 ccc: ", ccc)#}
+        {#console.log("2 ccc.length: ", ccc.length)#}
+        {#var cccc = {}#}
+        {#cccc = {% for p in process %}'{{ p.1 }}' {% endfor %}#}
+        {#console.log("2 cccc: ", cccc)#}
+        {#var process = []#}
+        {#process = {% for p in process %}'{{ process }}' {% endfor %}#}
+        console.log("2 process: ", '{{ process }}')
+        console.log("2 rsListSum: ", '{{ rsListSum }}')
+        console.log("2 rsListSum: ", '{{ rsListSum }}'.valueOf())
+        console.log("3 rsListSum.0: ", '{{ rsListSum.0 }}')
+        console.log("4 rsListSum.0.0: ", '{{ rsListSum.0.0 }}')
+
+        console.log("2 process: ", '{{ process }}')
+        console.log("2 process: ", '{{ process }}'.length)
+
+        var pro = [{% for i in process %}'{{ i.0 }}'{% endfor %}]
+        console.log("2 pro: ", pro)
+
+        {#var lsListSum1 = [{% for i in rsListSum %}'{{ i.0 }}'{% endfor %}]#}
+        {#console.log("2 lsListSum1: ", lsListSum1)#}
+
+
+        {#console.log("2 rsListSum: ", '{{ rsListSum }}'.length)#}
+        {#console.log("3 rsListSum.0: ", '{{ rsListSum.0 }}'.length)#}
+        {#console.log("3 rsListSum.0.0: ", '{{ rsListSum.0.0 }}'.length)#}
+
+        {#console.log("2 process: Object.keys().length: ", Object.keys('{{ process }}').length)#}
+        console.log("2 process: Object.keys().length: ", Object.keys('{{ process }}').length)
+
+        {#console.log("2 rsListSum: ", '{{ rsListSum }}'.length)#}
+        {#console.log("3 rsListSum.0: ", '{{ rsListSum.0 }}'.length)#}
+        {#console.log("3 rsListSum.0.0: ", '{{ rsListSum.0.0 }}'.length)#}
+
+        {#var eee = {}#}
+        {#eee = '{{ rsListSum }}'#}
+
+        console.log("3 rsListSum.0.0.0: ", '{{ rsListSum.0.0.0 }}')
+        console.log("3 rsListSum.0.0.1: ", '{{ rsListSum.0.0.1 }}')
+        console.log("3 rsListSum.0.0.2: ", '{{ rsListSum.0.0.2 }}')
+
+        {#for (var i = 0; i < )#}
+
+        {#ccc = {% for days in rslistSum %}'{{ rslistSum.0 }}'{% endfor %}#}
+{#        {% for days in rslistSum %}'{{ rslistSum.0.0.1 }}'{% endfor %}#}
+{#        console.log("2 days: ", '{{ days.0.0 }}')#}
+        {#    console.log("2 days: ", '{{ days }}')#}
+        {#    console.log("2 days: ", '{{ days }}')#}
+        {#{% endfor %}#}
+
+{#        {% for days in rslistSum %}#}
+{#            console.log("2 rsListSum: ", '{{ rsListSum }}')#}
+{#            console.log("2 rsListSum: ", '{{ days }}')#}
+{#            console.log("2 rsListSum: ", '{{ days }}')#}
+{#        {% endfor %}#}
+
+        {#var eee = {}#}
+        {#eee = {% for days in rsListSum %}'{{ rsListSum }}' {% endfor %}#}
+        {#console.log("2 eee: ", days)#}
+
+        {#var ddd = {}#}
+        {#ddd = {% for p in pp_data_period_process %}'{{ pp_data_period_process.0 }}', {% endfor %}#}
+        {#console.log("2 ddd: ", ddd)#}
+        {#console.log("2 process: ", {{ process.0 }})#}
+        {#var adddaa = {{ pp_data_period_process }}#}
+        {#console.log("2 pp_data_period_process: ", {{ pp_data_period_process }})#}
+        {#var eee = []#}
+        {#eee = {% for keys in rsDictSum %}'{{ keys.1 }}' {% endfor %}#}
+        {#console.log("2 eee: ", eee)#}
+        {#var fff = {}#}
+        {#fff = {% for values in rsDictSum %}'{{ values.0 }}' {% endfor %}#}
+        {#console.log("2 fff: ", fff)#}
+    </script>
+
+    <script type="text/javascript">
+
+    <script type="text/javascript">
+        var tdDays = document.querySelector('#tdDays').innerHTML;
+        console.log("2 typeof tdDays: ", typeof tdDays);
+        console.log("2 tdDays: ", tdDays);
+
+        var productsCount = Number('{{ productsCount | escapejs}}');
+        console.log("21 typeof productsCount: ", typeof productsCount);
+        console.log("21 productsCount: ", productsCount);
+
+        var products = '{{ products | escapejs}}';
+        console.log("21 typeof products: ", typeof products);
+        console.log("21 products: ", products);
+
+        var productsArr = products.split(",");
+        console.log("22 productsArr.length: ", productsArr.length);
+        console.log("22 typeof productsArr: ", typeof productsArr);
+        console.log("22 productsArr: ", productsArr);
+
+        console.log("22 productsArr[1]: ", productsArr[1]);
+
+
+
+
+
+
+        var ppDataPeriodProcessList = '{{ ppDataPeriodProcessList | escapejs}}';
+        console.log("21 typeof ppDataPeriodProcessList: ", typeof ppDataPeriodProcessList);
+        {#console.log("21 ppDataPeriodProcessList: ", ppDataPeriodProcessList);#}
+
+        {#var ppDataArr = ppData.split(")],");#}
+        var ppDataArr = ppDataPeriodProcessList.split(",");
+        console.log("22 ppDataArr.length: ", ppDataArr.length);
+        console.log("22 typeof ppDataArr: ", typeof ppDataArr);
+        console.log("22 ppDataArr: ", ppDataArr);
+
+        {#var ppDataArrObj = Object.values(ppDataArr);#}
+        {#console.log("333 ppDataArrObj.length: ", ppDataArrObj.length);#}
+        {#console.log("333 typeof ppDataArrObj: ", typeof ppDataArrObj);#}
+        {#console.log("333 ppDataArrObj: ", ppDataArrObj);#}
+
+        var ppQuantities = [];
+        for (let i=0; i<ppDataArr.length - 1; i++) {
+            for (let j=0; j<productsCount.length - 1; j++) {
+                var data1;
+                var ppQuantity = Number(ppDataArr[i].substring(fromSingleQuotation, toSingleQuotation + 1));
+                console.log(`${i},${j}: ppQuantity: ${ppQuantity}`)
+                if (ppQuantity > 0) ppQuantities.push(Number(ppQuantity));
+            }
+        }
+        console.log("33 ppQuantities: ", ppQuantities);
+
+
+        {#var labels = #}
+
+        var ppDays = [];
+        var ppProducts = [];
+        var ppQuantities = [];
+        for (var i = 0; i < ppDataArr.length; i++) {
+            var fromSingleQuotation = ppDataArr[i].indexOf("'");
+            {#console.log("22 ppDataArr.length: ", ppDataArr.length);#}
+            {#console.log("22 i: ", i);#}
+            {#console.log("22 fromSingleQuotation: ", fromSingleQuotation);#}
+            {#console.log("22 ppDataArr[i]: ", ppDataArr[i]);#}
+            var toSingleQuotation = ppDataArr[i].indexOf("'", fromSingleQuotation + 1);
+            {#console.log("22 toSingleQuotation: ", toSingleQuotation);#}
+
+            var remainder = i % 3;
+            if (remainder === 0) {
+                {#ppDays += ppDataArr[i];#}
+                ppDays.push(ppDataArr[i].substring(fromSingleQuotation, toSingleQuotation + 1));
+            } else if (remainder === 1) {
+                {#ppProducts += ppDataArr[i];#}
+                ppProducts.push(ppDataArr[i].substring(fromSingleQuotation, toSingleQuotation + 1));
+            } else {
+                {#ppQuantities += ppDataArr[i];#}
+                ppQuantities.push(ppDataArr[i].substring(fromSingleQuotation, toSingleQuotation + 1));
+            }
+        };
+        console.log("222 typeof ppDays: ", typeof ppDays);
+        console.log("222 ppDays: ", ppDays);
+        console.log("222 typeof ppProducts: ", typeof ppProducts);
+        console.log("222 ppProducts: ", ppProducts);
+        console.log("222 typeof ppQuantities: ", typeof ppQuantities);
+        console.log("222 ppQuantities: ", ppQuantities);
+
+        {#var ppData = `{{ ppData | escapejs}}`;#}
+        {#console.log("21 typeof ppData: ", typeof ppData);#}
+        {#console.log("21 ppData: ", ppData);#}
+
+        var para = document.location.href.split("?");
+        var protocol = window.location.protocol;
+        var host = window.location.host;
+        var href = window.location.href;
+        var para1 = window.location.href.split("?");
+        var pathArry = window.location.pathname.split('/');
+        var secondLevelLocation = pathArry[0];
+        var newPathName = "";
+        for (i = 0; i < pathArry.length; i++) {
+            if (pathArry[i].length > 0) {
+                newPathName += "/";
+            }
+            newPathName += pathArry[i];
+        }
+        {#console.log("para: ", para);#}
+        {#console.log("protocol: ", protocol);#}
+        {#console.log("host: ", host);#}
+        {#console.log("href: ", href);#}
+        {#console.log("para1: ", para1);#}
+        {#console.log("pathArry: ", pathArry);#}
+        {#console.log("newPathName: ", newPathName);#}
+        {#console.log("pathArry[0]: ", pathArry[0]);#}
+
+        console.log("####");
+        {#var dictObject = {'a': '111', 'b': '222', 'c': '333', 'd': "['kkk': '5555', 'jjj': '6666']"};#}
+        {#console.log("0 dictObject: ", dictObject);#}
+
+        {#console.log("rsDataFrameCount: ", '{{ rsDataFrameCount }}');#}
+        {#console.log("LANGUAGE_NO: ", '{{ LANGUAGE_NO }}');#}
+        {#console.log("process: ", '{{ process }}');#}
+        {#console.log("process.length: ", '{{ process }}'.length);#}
+
+        {#var aaa = {% for i in process %}'{{ i.0 }}'{% endfor %}#}
+        {#console.log("aaa: ", aaa);#}
+
+        {#console.log("rsTupleSum: ", '{{ rsTupleSum }}');#}
+        {#console.log("rsTupleSum.length: ", '{{ rsTupleSum }}'.length);#}
+
+        {#var bbb = {% for i in rsTupleSum %}'{{ i.0 }}'{% endfor %}  # 여기는 에러...#}
+        {#console.log("bbb: ", bbb);#}
+
+        {#console.log("rsTupleSum.0: ", '{{ rsTupleSum.0 }}');#}
+        {#console.log("rsTupleSum.0.length: ", '{{ rsTupleSum.0 }}'.length);#}
+
+        console.log("rsTupleSum.0.0: ", '{{ rsTupleSum.0.0 }}');
+        console.log("rsTupleSum.0.0.length: ", '{{ rsTupleSum.0.0 }}'.length);
+        console.log("rsTupleSum.0.1: ", '{{ rsTupleSum.0.1 }}');
+        console.log("rsTupleSum.0.1.length: ", '{{ rsTupleSum.0.1 }}'.length);
+        console.log("rsTupleSum.0.2: ", '{{ rsTupleSum.0.2 }}');
+        console.log("rsTupleSum.0.2.length: ", '{{ rsTupleSum.0.2 }}'.length);
+
+        {#console.log("rsDataFrameCount: ", '{{ rsDataFrameCount }}');#}
+
+        let rsDataFrameCount = Number('{{ rsDataFrameCount }}');
+        console.log("typeof(rsDataFrameCount): ", typeof(rsDataFrameCount));
+        console.log("rsDataFrameCount: ", rsDataFrameCount);
+
+        var rsTuple = [];
+        var rsWorkdate = [];
+        var rsStep9 = [];
+        var rsGoodness = [];
+        var rsTupleCurrent = []
+        for (var i = 0; i <= rsDataFrameCount; i++) {
+            rsTupleCurrent = '{{ rsTupleSum.0 }}';
+            console.log("typeof(rsTupleCurrent): ", typeof rsTupleCurrent);
+            console.log("rsTupleCurrent: ", rsTupleCurrent);
+            rsTuple += '{{ rsTupleSum.0 }}';
+            for (var j = 0; j <= 2; j++) {
+                rsWorkdate = rsTupleCurrent[0];
+                console.log("rsWorkdate: ", rsWorkdate);
+                rsStep9 = rsTupleCurrent[1];
+                console.log("rsWorkdate: ", rsWorkdate);
+                rsGoodness = rsTupleCurrent[2];
+                console.log("rsWorkdate: ", rsWorkdate);
+            }
+        }
+        console.log("rsTuple: ", rsTuple);
+        {#console.log("rsWorkdate: ", rsWorkdate);#}
+        {#console.log("rsStep9: ", rsStep9);#}
+        {#console.log("rsGoodness: ", rsGoodness);#}
+
+
+
+
+
+        {#function getData() {#}
+{#            {% for i in rsTupleSum %}#}
+{#                {% for j in i %}#}
+{#                    {{ j }}#}
+{#                {% endfor %}#}
+{#            {% endfor %}#}
+{#            return j#}
+{#        }#}
+{#        var bbb = getData()#}
+{#        console.log("bbb: ", bbb);#}
+
+        {#var bbb = {% for i in rsTupleSum %}'{{ i.0.0 }}'{% endfor %}#}
+        {#console.log("bbb: ", bbb);#}
+
+        {#var bbb = {% for i in rsTupleSum %}'{{ rsTupleSum.0 }}'{% endfor %}#}
+        {#console.log("bbb: ", bbb);#}
+
+        {#var bbb = {% for i in rsTupleSum %}'{{ i.0 }}'{% endfor %}#}
+        {#console.log("bbb: ", bbb);#}
+
+
+        {#var dataFrame = '{{ df_data_prd_pro_wor }}';#}
+        {#console.log("dataFrame: ", dataFrame;#}
+
+        {#$.ajax({#}
+        {#    url: '{{ df_data_prd_pro_wor }}',#}
+        {#    dataType: 'DataFrame',#}
+
+        {#var data = $('{{ df_data_prd_pro_wor }}').tableToJSON()#}
+        {#console.log("data: ", data);#}
+
+        {#var dfData = []#}
+        {#{% for data in df_data_prd_pro_wor %}#}
+        {#    {{ df_data_prd_pro_wor.step9 }}#}
+        {#{% endfor %}#}
+
+        var para = document.location.href.split("?");
+        var protocol = window.location.protocol;
+        var host = window.location.host;
+        var href = window.location.href;
+        var para1 = window.location.href.split("?");
+        var pathArry = window.location.pathname.split('/');
+        var secondLevelLocation = pathArry[0];
+        var newPathName = "";
+        for (i = 0; i < pathArry.length; i++) {
+            if (pathArry[i].length > 0) {
+                newPathName += "/";
+            }
+            newPathName += pathArry[i];
+        }
+        console.log("para: ", para);
+        console.log("protocol: ", protocol);
+        console.log("host: ", host);
+        console.log("href: ", href);
+        console.log("para1: ", para1);
+        console.log("pathArry: ", pathArry);
+        console.log("newPathName: ", newPathName);
+        console.log("pathArry[0]: ", pathArry[0]);
+
+        {#console.log("result: ", respo);#}
+
+        console.log("#######################################################################");
+        var dictObject = {'a': '111', 'b': '222', 'c': '333', 'd': "{'kkk': '5555', 'jjj': '6666'}"};
+        console.log("0 dictObject: ", dictObject);
+
+
+        console.log("LANGUAGE_CODE: ", LANGUAGE_CODE);
+
+
+        var keys = {};
+        var values = {};
+        {% for keys, values in rsDictSum.items %};
+            var dictObject = values;
+            console.log("dictObject: ", values);
+        {% endfor %};
+
+        const json_data = JSON.parse(dictObject|requirejs);
+        console.log("Object.keys: ", Object.keys(json_data));
+
+        const [labels, data] = [
+            Object.keys(json_data),
+            Object.values(json_data),
+        ];
+        console.log("1 Object.keys: ", Object.keys(json_data));
+        console.log("1 Object.values: ", Object.values(json_data));
+        {#console.log("1 labels.keys: ", Object.keys(json_data));#}
+        {#console.log("1 Object.values: ", Object.values(json_data));#}
+
+
+        {#dictObject = {{ rsDictSum }};#}
+
+
+
+        {#dictObject = JSON.parse(rsDictSum|requirejs);#}
+        console.log("1 dictObject: ", dictObject);
+        {#dictObject = rsDictSum;#}
+        console.log("2 dictObject: ", dictObject);
+
+        const renderChart = (data, labels) => {
+            var ctx = document.getElementById('myChartBarProduct').getContext('2d');
+            var myChartBarProduct = new Chart(ctx, {
+                type: 'bar', // 'line', 'doughnut', 'pie', 'bar',
+                data: {
+                    labels: labels, // ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                    datasets: [{
+                        label: '당월 제품별 진도 관리', //'# of Votes', : 그래프 내부 현재 datasets에 대한 타이틀...
+                        data: data,  // [12, 19, 3, 5, 2, 3],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    title: {
+                        display: false, //true, // 현재 공간만 차지하니, 타이틀은 뿌리지 말자...
+                        // text: "생산 실적 분석", // 그래프 내부 타이틀...
+                    }
+                }
+                // options: {
+                //     scales: {
+                //         yAxes: [{
+                //             ticks: {
+                //                 beginAtZero: true
+                //             }
+                //         }]
+                //     }
+                // }
+            });
+        }
+
+        const getChartData=() => {
+            console.log("fetching..."); // for Debugging...
+            // console.log("pp_product_analysis.js::data: ", data);
+
+            // fetch('') : 여기 안에는, url 이름을 적어 준다. views 이름이나 namespace 이름이 아님에 주의.
+            // ***** 또한 [pp_product_analysis]가 아님에 특히 주의... JSON 데이터를 보내 주는 [pp_product_summary]임에 주의...
+            // var para = `/process/${process.code}` // 이건 에러...
+            var para = document.location.href.split("?");
+            var protocol = window.location.protocol;
+            var host = window.location.host;
+            var href = window.location.href;
+            var para1 = window.location.href.split("?");
+            var pathArry = window.location.pathname.split('/');
+            var secondLevelLocation = pathArry[0];
+            var newPathName = "";
+            for (i = 0; i < pathArry.length; i++) {
+                if (pathArry[i].length > 0) {
+                    newPathName += "/";
+                }
+                newPathName += pathArry[i];
+            }
+            {#console.log("para: ", para);#}
+            {#console.log("protocol: ", protocol);#}
+            {#console.log("host: ", host);#}
+            {#console.log("href: ", href);#}
+            {#console.log("para1: ", para1);#}
+            {#console.log("pathArry: ", pathArry);#}
+            {#console.log("newPathName: ", newPathName);#}
+            {#console.log("pathArry[0]: ", pathArry[0]);#}
+
+            {#console.log("#######################################################################")#}
+            {#var dictObject = {}#}
+            {#dictObject = JSON.parse(rsDictSum|requirejs);#}
+            {#console.log("dictObject: ", dictObject)#}
+
+{#            var rsDictSumJs = {{ rsDictSum }};#}
+{#            {% for keys, values in rsDictSumJs.items %};#}
+{#                {% for key, val in values.items %};#}
+{#                    console.log("key: ", key);#}
+{#                    console.log("val: ", val);#}
+                    {#var rsDictSumJs = JSON.parse("{{ rsDictSum|escapejs }}");#}
+                    {#console.log("rsDictSumJs: ", rsDictSumJs);#}
+                    {#console.log("rsDictSumJs.items: ", rsDictSumJs.items);#}
+                    {#console.log("type(rsDictSumJs): ", typeof(rsDictSumJs));#}
+{#                {% endfor %};#}
+{#            {% endfor %};#}
+
+
+
+            // fetch('/process_selected').then((res) => res.json()).then((results) => {
+            fetch('/pp_product_summary').then((res) => res.json()).then((results) => {
+
+                // fetch(para).then((res) => res.json()).then((results) => {
+
+                console.log("results: ", results);
+
+                const json_data = results.rsDictSum;
+                const [labels, data] = [
+                    Object.keys(json_data),
+                    Object.values(json_data),
+                ];
+                // renderChart([data], [labels]);
+                renderChart((data), (labels));
+                // renderChart([], [])
+            });
+        };
+
+        document.onload = getChartData() // 반드시()를 써서, 함수를 부른다.
+
+
+    </script>
+
+{% endblock contentChart2 %}
+
+{#var ctx = document.getElementById('myChart');#}
+{##}
+{#        var config = {#}
+{#            type: 'bar',#}
+{#            data: {#}
+{#                labels: [ //Data Objects#}
+{#                    '2020.12.01',#}
+{#                    '2020.12.02',#}
+{#                    '2020.12.03',#}
+{#                    '2020.12.04',#}
+{#                    '2020.12.05',#}
+{#                    '2020.12.06',#}
+{#                    '2020.12.07'#}
+{#                ],#}
+{#                datasets: [{#}
+{#                    lable: 'My First dataset',#}
+{#                    backgroundColor: 'rgba(75,192,192,1)',#}
+{#                    borderColor: 'rgba(75,192,192,1)',#}
+{#                    fill: false,#}
+{#                    data: [#}
+{#                        Math.floor(Math.random() * 50),#}
+{#                        Math.floor(Math.random() * 50),#}
+{#                        Math.floor(Math.random() * 50),#}
+{#                        Math.floor(Math.random() * 50),#}
+{#                        Math.floor(Math.random() * 50),#}
+{#                        Math.floor(Math.random() * 50),#}
+{#                        Math.floor(Math.random() * 50)#}
+{#                    ],#}
+{#                }, {#}
+{#                    label: 'My Second dataset',#}
+{#                    backgroundColor: 'rgba(255, 99, 132, 1)',#}
+{#                    borderColor: 'rgba(255, 99, 132, 1)',#}
+{#                    fill: false,#}
+{#                    data: [#}
+{#                        Math.floor(Math.random() * 50),#}
+{#                        Math.floor(Math.random() * 50),#}
+{#                        Math.floor(Math.random() * 50),#}
+{#                        Math.floor(Math.random() * 50),#}
+{#                        Math.floor(Math.random() * 50),#}
+{#                        Math.floor(Math.random() * 50),#}
+{#                        Math.floor(Math.random() * 50)#}
+{#                    ],#}
+{#                }]#}
+{#            },#}
+{#            option: {#}
+{#                maintainAspectRatio: false,#}
+{#                title: {#}
+{#                    text: 'Chart.js Time Scale'#}
+{#                },#}
+{#                scales: {#}
+{#                    yAxes: [{#}
+{#                        scaleLabel: {#}
+{#                            display: true,#}
+{#                            labelString: '차트'#}
+{#                        }#}
+{#                    }]#}
+{#                },#}
+{#            }#}
+{#        };#}
+{##}
+{#        // 차트 그리기#}
+{#        var myChart = new Chart(ctx, config);#}
+{##}
+{#        // 데이터 변경#}
+{#        document.getElementById('reData').onclick = function() {#}
+{#            // 데이터셋 수 만큼 반복#}
+{#            var dataset = config.data.datasets;#}
+{#            for (var i = 0; i < dataset.length; i++) {#}
+{#                console.log((dataset));#}
+{#                var data = dataset[i].data;#}
+{#                for (var j = 0; j < data.length; j++) {#}
+{#                    data[j] = Math.floor(Math.random() * 50);#}
+{#                }#}
+{#            }#}
+{##}
+{#            myChart.update(); // 차트 업데이트#}
+{#        };#}
+{##}
+{#        // 데이터 추가#}
+{#        document.getElementById('addData').onclick = function() {#}
+{#            // 라벨 추가#}
+{#            config.data.labels.push('data' + config.data.labels.length)#}
+{#            // 데이터셋 수 만큼 반복#}
+{#            var dataset = config.data.datasets;#}
+{#            for (var i = 0; i < dataset; i++) {#}
+{#                // 데이터셋의 데이터 추가#}
+{#                dataset[i].data.push(Math.floor(Math.random() * 50));#}
+{#            }#}
+{#            myChart.update(); // 차트 업데이트#}
+{#        };#}
+{##}
+{#        // 데이터셋 추가#}
+{#        document.getElementById('addDataset').onclick = function() {#}
+{#            var color1 = Math.floor(Math.random() * 256);#}
+{#            var color2 = Math.floor(Math.random() * 256);#}
+{#            var color3 = Math.floor(Math.random() * 256);#}
+{#            console.log(color1 + " " + color2 + " " + color3)#}
+{##}
+{#            var newDataset = {#}
+{#                label: 'new Dataset' + config.data.datasets.length,#}
+{#                backgroundColor: 'rgba(' + color1 + ', ' + color2 + ', ' + color3 + ', 1)',#}
+{#                borderColor: 'rgba(' + color1 + ', ' + color2 + ', ' + color3 + ', 1)',#}
+{#                data: [],#}
+{#                fill: false#}
+{#            }#}
+{##}
+{#            // newDataset에 데이터 삽입#}
+{#            for (var i = 0; i < config.data.datasets.length; i++) {#}
+{#                var num = Math.floor(Math.random() * 50);#}
+{#                newDataset.data.push(num);#}
+{#            }#}
+{##}
+{#            // Chart에 newDataset 푸쉬#}
+{#            config.data.datasets.push(newDataset);#}
+{##}
+{#            myChart.update(); // 차트 업데이트#}
+{##}
+{#        }#}
+{##}
+{#        // 데이터 삭제#}
+{#        document.getElementById('delData').onclick = function() {#}
+{#            config.data.labels.splice(-1, 1); // 먼저 라벨 삭제#}
+{##}
+{#            // 데이터 삭제#}
+{#            config.data.datasets.forEach(function (dataset) {#}
+{#                dataset.data.pop();#}
+{#            })#}
+{#            myChart.update(); //차트 업데이트#}
+{#        }#}
+{##}
+{#        // 데이터셋 삭제#}
+{#        document.getElementById('delDataset').onclick = function() {#}
+{#            config.data.datasets.splice(-1, 1);#}
+{#            myChart.update() // 차트 업데이트#}
+{#        }#}
+
+
+
+{#{% block content %}#}
+{#    <br>#}
+{#    <div class="row">#}
+{#        <div class="col-md">#}
+{#            <div class="card card-body">#}
+{#                <h5>Process: </h5>#}
+{#                <hr>#}
+{#                <a class="btn btn-outline-info  btn-sm btn-block" href="">Update Process</a>#}
+{#                <a class="btn btn-outline-danger  btn-sm btn-block" href="">Delete Process</a>#}
+{##}
+{#            </div>#}
+{#        </div>#}
+{##}
+{#        <div class="col-md">#}
+{#            <div class="card card-body">#}
+{#                <h5>Contact Information</h5>#}
+{#                <hr>#}
+{#                <p>Code: {{ process.0.0 }}</p>#}
+{#                <p>공정명: {{ process.0.2 }}</p>#}
+{#            </div>#}
+{#        </div>#}
+{##}
+{#        <div class="col-md">#}
+{#            <div class="card card-body">#}
+{#                <h5>Total Production Performance</h5>#}
+{#                <hr>#}
+{#                <h1 style="text-align: center; padding: 10px">{{pp_data_period_count}}</h1>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{##}
+{##}
+{#    <br>#}
+{#    <div class="row">#}
+{#        <div class="col">#}
+{#            <div class="card card-body">#}
+{#                <form method="get">#}
+{#                <button class="btn btn-primary" type="submit">Search</button>#}
+{#              </form>#}
+{#            </div>#}
+{#        </div>#}
+{##}
+{#    </div>#}
+{#    <br>#}
+{##}
+{#    <div class="row">#}
+{#        <div class="col-md">#}
+{#            <div class="card card-body">#}
+{#                <table class="table table-sm">#}
+{#                    <tr>#}
+{#                        <th>생산 번호</th>#}
+{#                        <th>제품 규격</th>#}
+{#                        <th>양품량</th>#}
+{#                        <th>공정</th>#}
+{#						<th>Update</th>#}
+{#						<th>Remove</th>#}
+{#                    </tr>#}
+{#                    {% for row in pp_data_period_process %}#}
+{#                        <tr>#}
+{#                            <td>{{ row.1 }}</td>#}
+{#							<td>{{ row.3 }}</td>#}
+{#							<td>{{ row.4 }}</td>#}
+{#							<td>{{ row.5 }}</td>#}
+{#							<td><a class="btn btn-sm btn-info" href="">Update</a></td>#}
+{#                            <td><a class="btn btn-sm btn-danger" href="">Remove</a></td>#}
+{#                        </tr>#}
+{#                    {% endfor %}#}
+{#                </table>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#{% endblock content %}#}
+

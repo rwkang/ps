@@ -1,0 +1,21 @@
+{% extends 'ppp/index.html' %}
+{% load static %}
+{% block contentChart2 %}
+
+    <!-- <h1>공정별 생산 분석</h1> -->
+    {% for v in process %}
+        공정은 {{ v.2 }}
+    {% endfor %}
+{#    <h3>rsDictSum</h3>#}
+{#    {% for map in rsDictSum %}#}
+{#        {% for row in map %}#}
+{#            <td>{{ row.0 }}</td>#}
+{#            <td>{{ row.2 }}</td>#}
+{#        {% endfor %}#}
+{#    {% endfor %}#}
+
+    <canvas id="myChartBarProduct" height="300"></canvas>
+
+    <script src="{% static 'js/pp_product_analysis.js' %}"></script>
+
+{% endblock contentChart2 %}

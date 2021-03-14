@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="">
+{% load static %}
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <link rel="shortcut icon" href="{% static 'images/favicon/favicon.ico' %}" />
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+
+    <title>평산 생산 관리 - 월간</title>
+
+    <!-- 아래 3개 라인은 jQuery datepicker 사용을 위함... 맨 아래 2줄과 호응 : bootstrap datepicker : 아래 2줄은 필요없어 삭제했다.-->
+    <!-- 내 컴으로 파일 바꾸는 것은 나중에 처리... 지금 처리한 결과, image 파일에서 에러 발생... -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+{#    <link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" />#}
+{#    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>#}
+{#    <script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>#}
+
+{#    <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}" type="text/css" />#}
+{#    <script src="{% static 'js/jquery.min.js' %}"></script>#}
+{#    <script src="{% static 'js/jquery-ui.min.js' %}"></script>#}
+
+    <!-- 여기 [dataTables.bootstrap4.min.css] 파일은, 테이블 컬럼 텍스트 부분의 [정렬] 등을 정리해 주는 파일이다. -->
+    <link href="{% static 'css/dataTables.bootstrap4.min.css' %}" rel="stylesheet" crossorigin="anonymous" />
+
+    <!-- 여기 아래 문장은 내컴퓨터로 파일을 복사해서 실행하면, [사이드바] 보이기 또는 숨기기가 안 된다. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
+{#    <script src="{% static 'js/all.min.js' %}" crossorigin="anonymous"></script> <!-- : 여기는 이상하게 안 되네...-->#}
+
+    <!-- 여기 아래 문장은 그래프 설정 -->
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>#}
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>#}
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js" crossorigin="anonymous"></script>#}
+{#    <script src="{% static 'js/Chart.min.js' %}" crossorigin="anonymous"></script>#}
+
+    <script src="https://cdn.jsdelivr.net/npm/danfojs@0.1.2/dist/index.min.js"></script>
+
+    <!-- 아래 내용은 엑셀로 내릴 때 사용하는 것이고, html 파일에서는 humanize 앱을 settings.py 파일에 추가하고 사용한다.
+    <style>
+        td.three-decimals {mso-number-format: "0\.00"}
+        td.thousands-separator {mso-number-format: "\#\,\#\#0\.00"}
+        td.thousands-separator-point-zero {mso-number-format: "\#\,\#\#0"}
+        td.fractions {mso-number-format: "#\ ???/???"}
+        td.negative-red {mso-number-format: "#,##0.00_ ;[Red]-#,##0.00\ "  }
+    </style>
+    -->
+
+    <style type="text/css">
+        .chartjs-legend ol,
+        .chartjs-legend ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            text-align: right;
+        }
+
+        .chartjs-legend li {
+            cursor: pointer;
+            display: inline-table;
+            margin: 10px 4px;
+        }
+
+        .chartjs-legend li span.line {
+            position: relative;
+            padding: 1px 10px;
+            margin: 5px;
+            color: white;
+        }
+
+        .chartjs-legend li div.line {
+            float: left;
+            height: 2px;
+            background: #000;
+            font-size: 0;
+            line-height: 0;
+            width: 25px;
+            padding: 1px 0px;
+            border-radius: 100px;
+            margin: 9px 5px;
+        }
+    </style>
+
+</head>
+
+<body class="sb-nav-fixed">
+
+{% include 'ppp/navbar.html' %}
+
+<div id="layoutSidenav">
+
+    {% include 'ppp/sidebar.html' %}
+
+    <div id="layoutSidenav_content">
+        <main>
+
+            {% include 'ppp/status.html' %}
+
+            <div class="container-fluid">
+
+                <!-- 그래프 부분 -->
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card mb-4">
+                            <div id="chartArea" style="width:700px;">
+                                <div id="chartLegend" class="chartjs-legend"></div> <canvas id="myChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card mb-4">
+                            {#                            <div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div>#}
+                            {#                            <div class="card-body"><canvas id="myChartBarProduct" width="100%" height="40"></canvas></div>#}
+{#                            {% block contentChart2 %}#}
+                            {% include 'ppp/process.html' %}
+{#                            {% endblock %}#}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 표 부분 -->
+                <div class="row">
+                    <div class="col-md-2"> <!--여기는 전체 화면에 5칸을 쓴다는 의미이고, 아래에서 7칸을 쓴다는 의미...-->
+                        <div class="card card-body" id="process-container">
+
+                            {% include 'ppp/table_process.html' %}
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-10"> <!--여기는 전체 화면에 7칸을 쓴다는 의미이고, 위에서 5칸을 쓴다는 의미...-->
+                        <div class="card card-body" id="production-container">
+{#                            {% block table_pp_data %}#}
+                            {% include 'ppp/table_pp_data.html' %}
+{#                            {% endblock %}#}
+                        </div>
+                        <div class="content" id="more-data"></div> <!-- 여기에 [로딩중...] 버튼을 삽입한다. -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="py-4 bg-light mt-auto">
+            <div class="container-fluid">
+                <div class="d-flex align-items-center justify-content-between small">
+                    <div class="text-muted">Copyright &copy; Your Website 2020</div>
+                    <div>
+                        <a href="#">Privacy Policy</a>
+                        &middot;
+                        <a href="#">Terms &amp; Conditions</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+</div>
+
+
+
+<!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script> -->
+{#<script src="{% static 'js/jquery-3.5.1.slim.min.js' %}" crossorigin="anonymous"></script>#}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+{#<!-- <script src="{% static 'js/bootstrap.bundle.min.js' %}" crossorigin="anonymous"></script> : 여기는 이상하게 안 되네...-->#}
+
+{# 2021.01.23 아래 2개 파일은 아직 뭔 기능인지 파악이 안 된 상태라 잠시 실행 보류 상태...#}
+{#<script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.9.0/feather.min.js"></script>#}
+{#<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>#}
+
+<!-- 2021.02.04 Conclusion. 아래 2개 라인을 실행하면, 싸이트가 열리면서 바로 console.log()에서, 에러 메시지 2개가 뿌려진다.-->
+{#<script src="{% static 'js/chart-bar-demo.js' %}"></script>#}
+{#<script src="{% static 'js/chart-area-demo.js' %}"></script>#}
+
+<!-- jquery.dataTables.min.js : 테이블 텍스트 상단에, 뿌려지는 레코드 수와 검색 란 표시 -->
+{#<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>#}
+{#<script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>#}
+<script src="{% static 'js/jquery.dataTables.min.js' %}" crossorigin="anonymous"></script>
+<script src="{% static 'js/dataTables.bootstrap4.min.js' %}" crossorigin="anonymous"></script>
+<script src="{% static 'js/datatables-demo.js' %}"></script>
+
+{#<script src="{% static 'js/pp_process_analysis.js' %}"></script>#}
+{#<script src="{% static 'js/pp_product_analysis.js' %}"></script>#}
+
+<!-- promise와 ECMA Script를 이용한 비동기 : 가독성 재고 -->
+{#<script src="https://unpkg.com/axios/dist/axios.min.js"></script>#}
+
+<script src="{% static 'js/scripts.js' %}"></script>
+
+{#<script src="{% static 'js/datepicker-ko.js' %}"></script> <!-- ERR_ABORTED 404 (Not Found) -->#}
+
+{#<script>#}
+{#    var aa = "{{ date_list }}"#}
+{#    var options = {#}
+{#        chart: {#}
+{#            h#}
+{#        }#}
+{#    }#}
+{#</script>#}
+
+
+{#<script type="text/javascript">#}
+{#    $(function(){#}
+{#        $('#fromDate').datetimepicker({ });#}
+{#        $('#toDate').datetimepicker({ });#}
+{#    });#}
+{#</script>#}
+
+{#<script>#}
+{#    function selectedProcess(x) {#}
+{#        var currentProcessNumber = x.rowIndex;#}
+{#        console.log("currentProcessNumber: ", currentProcessNumber)#}
+{#    }#}
+{#</script>#}
+
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.bundle.min.js"></script>
+
+<script>
+    var barChartData = {
+        labels: ["January", "February", "March", "April", "May", "June", "July"],
+        datasets: [{
+            type: 'line', label: 'line', borderColor: "#1E90FF", fill: false,
+            data: [
+                Math.random()*90000,
+                Math.random()*90000,
+                Math.random()*90000,
+                Math.random()*90000,
+                Math.random()*90000,
+                Math.random()*90000,
+                Math.random()*90000
+            ]
+        },
+            { type: 'bar', label: 'bar', backgroundColor: "#F7464A",
+                data: [
+                    Math.random()*90000,
+                    Math.random()*90000,
+                    Math.random()*90000,
+                    Math.random()*90000,
+                    Math.random()*90000,
+                    Math.random()*90000,
+                    Math.random()*90000
+                ]
+            }]
+    };
+
+    window.onload = function() {
+        var ctx = $('#myChart').get(0).getContext("2d");
+        window.myChart = new Chart(ctx, {
+            type: 'bar',
+            data: barChartData,
+            options: {
+                legend: false, legendCallback: function(myChart){
+                    return drawCustomLegend(myChart);
+                }// 사용자 범례를 만들 때 쓰는 함수를 지정하거나 작성한다.
+            }
+        });
+        $('#chartLegend').html(window.myChart.generateLegend());//사용자 범례 자리에 해당 차트에 대한 사용자 범례 코드를 넣는다.
+    };
+
+    function drawCustomLegend(myChart){
+    var text = [];
+    text.push('<ul class="' + myChart.id + '-legend">');
+    if(myChart.config.type == 'bar'){//막대차트, 막대라인차트일 경우
+        var barIndex = myChart.data.datasets.length;
+        for (var i = 0; i <myChart.data.datasets.length; i++) {
+            if(myChart.data.datasets[i].type == 'line' == false){
+                barIndex = i; break; }
+        } //라인 형식 데이터셋이 어디까지인지 확인
+        // -> 막대 형식의 데이터셋을 라인 형식의 데이터셋보다 앞에 둘 경우 라인이 막대에 묻히기 때문에 라인 형식이 먼저 올 수 밖에 없다.
+        // 그러나 막대 형식의 데이터셋의 범례를 먼저 그리고 싶었기 때문에 해당 작업을 했다.
+        for (i = barIndex; i <myChart.data.datasets.length; i++) {
+            if(!(myChart.data.datasets[i].hideLegend) && myChart.data.datasets[i].label){
+                text.push('<li datasetIndex="'+i+'"><span class="bar" style="background-color:' + myChart.data.datasets[i].backgroundColor + '" ></span>');
+                text.push('<span>'+myChart.data.datasets[i].label+'</span>');
+                text.push('</li>');
+            }
+        }//막대 형식 데이터셋의 범례를 먼저 그림
+         for (i = 0; i <barIndex; i++) {
+             if(!(myChart.data.datasets[i].hideLegend) && myChart.data.datasets[i].label){
+                 text.push('<li datasetIndex="'+i+'"><div class="line" style="background:' + myChart.data.datasets[i].borderColor + '"></div>');
+                 text.push('<span>'+myChart.data.datasets[i].label+'</span>');
+                 text.push('</li>');
+                 }
+             }//막대 형식 데이터셋의 범례를 그린 후 라인 형식 데이터셋의 범례를 그림.
+         } else if(myChart.config.type == 'line'){//라인 차트일 경우
+         for (i = 0; i <myChart.data.datasets.length; i++) {
+             if(!(myChart.data.datasets[i].hideLegend) && myChart.data.datasets[i].label){
+                 text.push('<li datasetIndex="'+i+'"><span class="line" style="background-color:' + myChart.data.datasets[i].borderColor + '"></span>');
+                 text.push('<span>'+myChart.data.datasets[i].label+'</span>');
+                 text.push('</li>');
+             }
+         }
+    }
+    text.push('</ul>');
+    return text.join(""); }
+
+</script>
+
+
+{#출처: https://risha-lee.tistory.com/18 [리샤의 개발 일지]#}
+
+</body>
+
+</html>

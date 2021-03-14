@@ -1,0 +1,54 @@
+/*아래 [canvas, .chart-container, .container] 내용은, [script_capacity.js]에서 [Interactions Graph]에서 사용*/
+canvas {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+.chart-container {
+    width: 435px;
+    height: 235px;
+    /*margin-left: 40px;*/
+    /*margin-right: 40px;*/
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%; /* ***** 여기 라인이 없으면, 각각의 그래프가 [종]으로 1개씩 그려진다. ***** */
+}
+
+/* 2021.03.07 Added. Alert 팝업창*/
+#wait {
+    width: 100%;
+    height: 100vh;
+    background: #0008;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+}
+#wait-popup {
+    text-align: center;
+    width: 400px;
+    height: 300px;
+    background: #5cc4ef;
+    box-sizing: border-box;
+    padding: 20px;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* 아래 내용은 엑셀로 내릴 때 사용하는 것이고, html 파일에서는 humanize 앱을 settings.py 파일에 추가하고 사용한다.*/
+td.three-decimals {mso-number-format: "0\.00"}
+td.thousands-separator {mso-number-format: "\#\,\#\#0\.00"}
+td.thousands-separator-point-zero {mso-number-format: "\#\,\#\#0"}
+td.fractions {mso-number-format: "#\ ???/???"}
+td.negative-red {mso-number-format: "#,##0.00_ ;[Red]-#,##0.00\ "  }

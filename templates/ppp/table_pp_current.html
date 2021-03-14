@@ -1,0 +1,62 @@
+{% block table_pp_data %}
+{% load humanize %}
+<a class="btn btn-primary  btn-sm btn-block" href="">생산 능력 정보</a>
+<div class="table-responsive mt-2">
+    <!-- <table class="table table-sm"> -->
+    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+        <thead>
+        <tr>
+            <th>생산 번호</th>
+            <th>제품 규격</th>
+            <th>계획 수량</th>
+            <th>양품 수량</th>
+            <th>양품 누계</th>
+            <th>공정</th>
+{#            <th>계획 수량</th>#}
+            {#            <th>수정</th>#}
+            {#            <th>삭제</th>#}
+        </tr>
+        </thead>
+        <tfoot>
+        <tr class="titlerow">
+            <th>생산 번호</th>
+            <th>제품 규격</th>
+            <!--<th>양품량</th>-->
+            <!--<th>공정</th>-->
+            <th>계획 수량</th> <!-- 계획 수량은 페이지 합계를 내면 더 이상하다. 로우 수량이 [월간 계획 총 수량] 임에 주의-->
+            <th style="text-align: right" id="currentPageTotal"></th>
+            <!--<th>양품 누계</th>-->
+            <th style="text-align: right" id="currentPageTotal2"></th>
+            <th style="text-align: right" id="processTotal"></th>
+            {#            <th>수정</th>#}
+            {#            <th>삭제</th>#}
+        </tr>
+        </tfoot>
+        <tbody id="tableBody">
+        {% csrf_token %}
+        {% for row in jsonCurrent %}
+            <tr>
+                {{ getLanguage }}
+                <td>{{ row.productionactualno|truncatewords:30 }}</td>
+                <td>{{ row.step9|truncatewords:30 }}</td>
+                <td align="right" class="planqty">{{ row.planqty|floatformat:0|intcomma }}</td>
+                <td align="right" class="goodness">{{ row.goodness|floatformat:0|intcomma }}</td>
+                <td align="right" class="goodnesscumsum">{{ row.goodnesscumsum|floatformat:0|intcomma }}</td>
+{#                <td align="right" class="currentRowQty">{{ row.goodness|floatformat:0|intcomma }}</td>#}
+{#                <td align="right" class="currentRowCum">{{ row.goodnesscumsum|floatformat:0|intcomma }}</td>#}
+                {{ getLanguage }}
+                {% if LANGUAGE_NO == 1042 %}
+                    <td>{{ row.processinfo }}</td>
+                {% else %}
+                    <td>{{ row.processinfo }}</td>
+                {% endif %}
+                {#                <td><a class="btn btn-sm btn-info" href="">수정</a> </td>#}
+                {#                <td><a class="btn btn-sm btn-danger" href="">삭제</a> </td>#}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}
+

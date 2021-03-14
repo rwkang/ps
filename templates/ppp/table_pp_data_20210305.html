@@ -1,0 +1,51 @@
+{% block table_pp_data %}
+{% load humanize %}
+<a class="btn btn-primary  btn-sm btn-block" href="">생산 실적 생성</a>
+<div class="table-responsive mt-2">
+    <!-- <table class="table table-sm"> -->
+    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+        <thead>
+        <tr>
+            <th>생산 번호</th>
+            <th>제품 규격</th>
+            <th>양품량</th>
+            <th>공정</th>
+            {#            <th>수정</th>#}
+            {#            <th>삭제</th>#}
+        </tr>
+        </thead>
+        <tfoot>
+        <tr class="titlerow">
+            <th>생산 번호</th>
+            <th>제품 규격</th>
+            <!--<th>양품량</th>-->
+            <!--<th>공정</th>-->
+            <th style="text-align: right" id="ppQtyTotalCurrentPage"></th>
+            <th style="text-align: right" id="ppQtyTotalProcess"></th>
+            {#            <th>수정</th>#}
+            {#            <th>삭제</th>#}
+        </tr>
+        </tfoot>
+        <tbody id="tableBody">
+        {% csrf_token %}
+        {% for row in pp_data_period_process %}
+            <tr>
+                <td>{{ row.1|truncatewords:30 }}</td>
+                <td>{{ row.3|truncatewords:40 }}</td>
+                <td align="right" class="ppQty">{{ row.4|floatformat:0|intcomma }}</td>
+                {{ getLanguage }}
+                {% if LANGUAGE_NO == 1042 %}
+                    <td>{{ row.9 }} {{ row.10 }}</td>
+                {% else %}
+                    <td>{{ row.9 }} {{ row.11 }}</td>
+                {% endif %}
+                {#                <td><a class="btn btn-sm btn-info" href="">수정</a> </td>#}
+                {#                <td><a class="btn btn-sm btn-danger" href="">삭제</a> </td>#}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}
+

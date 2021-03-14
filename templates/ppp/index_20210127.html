@@ -1,0 +1,58 @@
+{% extends 'ppp/base.html' %}
+{% load static %}
+
+{% block content %}
+
+    <div class="container-fluid">
+        <!-- 그래프 부분 -->
+        <div class="row">
+            <div class="col-md-12"> <!--여기는 전체 화면에 5칸을 쓴다는 의미이고, 아래에서 7칸을 쓴다는 의미...-->
+                <div class="col-xl-12">
+                    <canvas id="myChartBarProcess" height="300"></canvas>
+
+                    {% include 'ppp/pp_process_analysis.html' %}
+
+                    {% block content_chart1 %}
+
+                    {% endblock content_chart1 %}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6"> <!--여기는 전체 화면에 5칸을 쓴다는 의미이고, 아래에서 7칸을 쓴다는 의미...-->
+                <div class="col-xl-12">
+                    <canvas id="myChartBarProduct" height="300"></canvas>
+
+                    {% include 'ppp/pp_product_analysis.html' %}
+
+                    {% block content_chart2 %}
+
+                    {% endblock content_chart2 %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 표 부분 -->
+    <div class="row">
+        <div class="col-md-2"> <!--여기는 전체 화면에 5칸을 쓴다는 의미이고, 아래에서 7칸을 쓴다는 의미...-->
+            <div class="card card-body">
+
+                {% include 'ppp/table_process.html' %}
+
+            </div>
+        </div>
+
+        <div class="col-md-10"> <!--여기는 전체 화면에 7칸을 쓴다는 의미이고, 위에서 5칸을 쓴다는 의미...-->
+            <div class="card card-body">
+
+                {% include 'ppp/table_pp_data.html' %}
+
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+{% endblock %}
+

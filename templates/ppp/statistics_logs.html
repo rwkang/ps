@@ -1,0 +1,119 @@
+{#stat_type은 M일 경우 월별, D일 경우 일별 통계를 뽑기 위해 구분했습니다.#}
+{#쿼리 셋을 만들 때, annotate(stat_date=TruncMonth('log_date'))를 만들어서 stat_date로 group by효과를 주었고,#}
+{#TruncMonth는 날짜에서 월만 빼는 dJango 메서드입니다.#}
+{#html은 statistics_logs.html로 만들었어요. 넘어가는 값이 현재는 stat_date와 stat_count 두 개입니다.#}
+
+{#키포인트는 input을 만들고. datetimepicker를 달아서 클릭했을 때 날짜를 선택하는 위젯을 띄우는 겁니다.#}
+{#datetimepicker는 부트스트랩에서 제공하는 위젯인데요, 사용하기 위해서 js/css 파일을 받아서 선언을 해줘야 합니다.#}
+
+{#<link href="/static/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />#}
+{#<script type="text/javascript" src="/static/moment-with-locales.min.js"></script>#}
+{#<script type="text/javascript" src="/static/bootstrap-datetimepicker.min.js"></script>#}
+
+{#위의 3줄이 핵심입니다. locales.js는 호출 안 했더니 에러가 나서 추가해줬습니다.#}
+{#그리고 또 바뀐 점이 있는데, 기존에는 css, js파일들을 /static/ 경로에 몰아서 저장해놨었는데,#}
+{#/static/css, /static/fonts, /static/으로 나누었습니다.#}
+{#나누지 않았더니 css에서 fonts를 호출할 때 경로 에러가 나더라고요.#}
+{#bootstrap.css 소스 까 보면 폰트 경로가 ../fonts/..로 되어있어서#}
+{#상위 경로에 fonts폴더를 만들기 위해 css폴더 안으로 다 밀어 넣었습니다.#}
+
+{#출처: https://cholol.tistory.com/454 [IT, I Think ]#}
+
+
+{# template/adminpage/statistics_logs #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+{#    <script type="text/javascript" src="/static/jquery-3.2.1.min.js"></script>#}
+{#    <link rel="stylesheet" href="/static/css/bootstrap.css">#}
+{#    <script type="text/javascript" src="/static/bootstrap.js"></script>#}
+    <script type="text/javascript" src="/static/jquery.bootstrap.modal.forms.js"></script>
+{#    <link href="/static/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />#}
+{#    <script type="text/javascript" src="/static/moment-with-locales.min.js"></script>#}
+{#    <script type="text/javascript" src="/static/bootstrap-datetimepicker.min.js"></script>#}
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/ko.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+
+</head>
+<body>
+<style type="text/css">
+    .tg {border-collapse:collapse;border-spacing:0;}
+    .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+    .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+    .tg .tg-21xh{font-weight:bold;background-color:#34cdf9;color:#333333;border-color:inherit;text-align:left;vertical-align:top}
+    .tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
+    .content_wrap {width: 80%; margin: 0 auto;} .pagination {text-align: center; width: 100%;}
+</style>
+<div class="modal fade" tabindex="-1" role="dialog" id="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+{% include "adminpage/menu.html" %}
+<div class="content_wrap">
+    <div style="position: relative">
+        <input id="fromDate" type="text" >
+        <input id="toDate" type="text">
+    </div>
+    <table class = "tg">
+        <colgroup>
+            <col width="50%">
+            <col width="50%">
+        </colgroup>
+        <tr>
+            <th class="tg-21xh"> 기준 </th>
+            <th class="tg-21xh"> 카운트 </th>
+        </tr>
+        {% for stat in stats %}
+            <tr>
+                <td>{{ stat.stat_date }}</td>
+                <td>{{ stat.stat_count }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    {# template/adminpage/statistics_logs.html #}
+    <form action="/statistics_logs/" method="get">
+        <fieldset >
+            <select id="stat_type" name="stat_type">
+                <option value="D" {% if stat_type != 'M' %} selected {% endif %}> 일별 </option>
+                <option value="M" {% if stat_type == 'M' %} selected {% endif %}> 월별 </option>
+            </select>
+            <div class="radio" style="display: inline">
+                <label>
+                    <input type="radio" name="optionRadios" id="optionsRadios1" value="total"
+                            {% if optionRadios != 'period' %} checked {% endif %}/> 전체
+                </label>
+            </div>
+            <div class="radio" style="display: inline">
+                <label>
+                    <input type="radio" name="optionRadios" id="optionsRadios2" value="period"
+                            {% if optionRadios == 'period' %} checked {% endif %}/> 기간 :
+                </label>
+                <input id="fromDate" data-provide="datepicker" data-date-format="yyyy-mm-dd" name="from_date" value = {{ from_date }}>
+                <label> ~ </label>
+                <input id="toDate" data-provide="datepicker" data-date-format="yyyy-mm-dd" name="to_date" value = {{ to_date }}>
+            </div>
+            <button type="submit">조회</button>
+        </fieldset>
+    </form>
+
+</div>
+</body>
+<script type="text/javascript">
+    $(function(){
+        $('#fromDate').datetimepicker({ });
+        $('#toDate').datetimepicker({ });
+    });
+</script>
+</html>

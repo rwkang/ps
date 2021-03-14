@@ -1,0 +1,658 @@
+{#{% extends 'ppp/index.html' %}#}
+{#{% load static %}#}
+{#{% block contentChart2 %}#}
+
+<div class="container">
+
+</div>
+
+<div id="space-after-chart">
+    <br>
+    <br>
+    <br>
+</div>
+
+{#    <button type="button" id="reData">데이터 변경</button>#}
+{#    <button type="button" id="addData">데이터 추가</button>#}
+{#    <button type="button" id="addDataset">데이터셋 추가</button>#}
+{#    <button type="button" id="delData">데이터 삭제</button>#}
+{#    <button type="button" id="delDataset">데이터셋 삭제</button>#}
+
+
+<script type="text/javascript">
+
+    let languageNo = parseInt('{{ LANGUAGE_NO | escapejs }}');
+
+    let needsHourTotal = parseInt('{{ needsHourSum | escapejs }}');
+    let planQtyTotal = parseInt('{{ planQtySum | escapejs }}');
+    console.log("capacity.html 0 planQtyTotal: ", planQtyTotal);
+
+    let goodnessTotal = parseInt('{{ goodnessTotal | escapejs }}');
+    let volumesTotal = parseInt('{{ volumesTotal | escapejs }}');
+
+    let fromDateString = '{{ fromDate | escapejs }}';
+    let toDateString = '{{ toDate | escapejs }}';
+    document.getElementById("fromDate").value = fromDateString; // 결론적으로 이렇게 사용하기로 한다. : 이것도 잘 되고...
+    document.getElementById("toDate").value = toDateString; // 결론적으로 이렇게 사용하기로 한다. : 이것도 잘 되고...
+    {#console.log("process.html 0 fromDateString: ", fromDateString);#}
+    {#console.log("process.html 0 toDateString: ", toDateString);#}
+
+    let processCodeCurrent = '{{ processCode | escapejs }}';
+    {#console.log("process.html 0 processCodeCurrent: ", processCodeCurrent);#}
+    {#console.log("process.html 0 typeof processCodeCurrent: ", typeof processCodeCurrent);#}
+
+    {#var dataTable = document.querySelector('#dataTable').innerHTML;#}
+    {#console.log("2 typeof dataTable: ", typeof dataTable);#}
+    {#console.log("2 dataTable: ", dataTable);#}
+
+    // x축 세팅...
+    var ppDataPeriod = '{{ machineList | escapejs}}';
+    {#console.log("21 typeof ppDataPeriod: ", typeof ppDataPeriod);#}
+    {#console.log("21 ppDataPeriod: ", ppDataPeriod);#}
+
+    var ppDataPeriodArr = ppDataPeriod.split(",");
+    {#console.log("22 ppDataPeriodArr.length: ", ppDataPeriodArr.length);#}
+    {#console.log("22 typeof ppDataPeriodArr: ", typeof ppDataPeriodArr);#}
+    {#console.log("22 ppDataPeriodArr: ", ppDataPeriodArr);#}
+
+    // String 타입 자료를 List 자료형으로 변경
+    var ppDataPeriodArrList = [];
+    for (let i = 0; i < ppDataPeriodArr.length; i++) {
+        var fromSingleQuotation = ppDataPeriodArr[i].indexOf("'");
+        //console.log("22 fromSingleQuotation: ", fromSingleQuotation);
+        //console.log("22 ppDataPeriod[i]: ", ppDataPeriodArr[i]);
+        var toSingleQuotation = ppDataPeriodArr[i].indexOf("'", fromSingleQuotation + 1);
+        //console.log("22 toSingleQuotation: ", toSingleQuotation);
+        ppDataPeriodArrList.push(ppDataPeriodArr[i].substring(fromSingleQuotation, toSingleQuotation + 1));
+    };
+    {#console.log("23 typeof ppDataPeriodArrList: ", typeof ppDataPeriodArrList);#}
+    {#console.log("23 ppDataPeriodArrList: ", ppDataPeriodArrList);#}
+
+    var productsCount = Number('{{ productsCount | escapejs}}');
+    //console.log("24 typeof productsCount: ", typeof productsCount);
+    {#console.log("24 productsCount: ", productsCount);#}
+
+    // Legent.레전드 세팅...
+    {#var products = '{{ products | escapejs}}';#}
+    var products = '{{ machineList | escapejs}}';
+    {#console.log("25 typeof products: ", typeof products);#}
+    {#console.log("25 products: ", products);#}
+
+    var productsArr = products.split(",");
+    {#console.log("26 productsArr.length: ", productsArr.length);#}
+    {#console.log("26 typeof productsArr: ", typeof productsArr);#}
+    {#console.log("26 productsArr: ", productsArr);#}
+    var productsArrList = [];
+    for (let i = 0; i < productsArr.length; i++) {
+        var fromSingleQuotation = productsArr[i].indexOf("'");
+        {#console.log("26 fromSingleQuotation: ", fromSingleQuotation);#}
+        if (fromSingleQuotation < 0) {
+            continue;
+        } else {
+            var toSingleQuotation = productsArr[i].lastIndexOf("'");
+            {#console.log("26 toSingleQuotation: ", toSingleQuotation);#}
+            var product = productsArr[i].substr(fromSingleQuotation, toSingleQuotation)
+            productsArrList.push(product)
+        }
+    }
+    {#console.log("266 productsArrList.length: ", productsArrList.length);#}
+    {#console.log("266 typeof productsArrList: ", typeof productsArrList);#}
+    {#console.log("266 productsArrList: ", productsArrList);#}
+
+    {#console.log("27 productsArrList[1]: ", productsArrList[1]);#}
+
+    var ppDataPeriodProcessList = '{{ needsHourList | escapejs}}';
+    {#var ppDataPeriodProcessList2 = '{{ capacityHour8List | escapejs}}';#}
+    var ppDataPeriodProcessList2 = '{{ capacityHour8List | escapejs}}';
+    {#var ppDataPeriodProcessList2 = '{{ capacityList | escapejs}}'; 이건 전체 DataFrame을 리스트화 한 자료임.#}
+
+    {#console.log("28 typeof ppDataPeriodProcessList: ", typeof ppDataPeriodProcessList);#}
+    {#console.log("28 ppDataPeriodProcessList: ", ppDataPeriodProcessList);#}
+
+    var ppDataArr = ppDataPeriodProcessList.split("],");
+    var ppDataArr2 = ppDataPeriodProcessList2.split("],");
+    {#console.log("29 ppDataArr.length: ", ppDataArr.length);#}
+    {#console.log("29 typeof ppDataArr: ", typeof ppDataArr);#}
+    {#console.log("29 ppDataArr: ", ppDataArr);#}
+
+    {#var ppDataPeriodProcessListArr = ppDataPeriodProcessList.split(",");#}
+    {#console.log("29 ppDataPeriodProcessListArr.length: ", ppDataPeriodProcessListArr.length);#}
+    {#console.log("29 typeof ppDataPeriodProcessListArr: ", typeof ppDataPeriodProcessListArr);#}
+    {#console.log("29 ppDataPeriodProcessListArr: ", ppDataPeriodProcessListArr);#}
+
+
+    // arr[5][2] (빈 배열 생성)
+    // Arry 객체에 배열생성함수를 추가하여 2차원 배열을 생성하는 방법
+    Array.matrix = function (m, n, initial) {
+        var a, i, k, mat = [];
+        for (i = 0; i < m; i += 1) {
+            a = [];
+            for (k = 0; k < n; k += 1) {
+                a[k] = initial;
+            }
+            mat[i] = a;
+        }
+        return mat;
+    };
+
+    // matrix(행, 열, 기본값)
+    let first = ppDataPeriodArr.length;
+    let second = productsArr.length;
+    var ppQuantitiesDays = Array.matrix(first, second, 0);
+    //console.log(`30 first: ${first}, second: ${second}`);
+    //console.log("30 ppQuantitiesDays.length: ", ppQuantitiesDays.length);
+    //console.log("30 typeof ppQuantitiesDays: ", typeof ppQuantitiesDays);
+    //console.log("30 ppQuantitiesDays: ", ppQuantitiesDays);
+
+    // ppQuantitiesDays[0] = '2020-12-01'; ***** 이런식으로 [1차원] 배열에 [값]을 넣게 되면, [2차원] 배열을 못 쓴다.
+    //ppQuantitiesDays[0][0] = 222;
+    //console.log("30 ppQuantitiesDays[0]: ", ppQuantitiesDays[0]);
+    //console.log("30 ppQuantitiesDays[0][0]: ", ppQuantitiesDays[0[0]]);
+
+    //const ppQuantitiesDays1 = Array.from(Array(first), () => new Array(second).fill(0) : 요기는 안 되네...
+    //console.log("31 ppQuantitiesDays1.length: ", ppQuantitiesDays1.length);
+    //console.log("31 typeof ppQuantitiesDays1: ", typeof ppQuantitiesDays1);
+    //console.log("31 ppQuantitiesDays1: ", ppQuantitiesDays1);
+
+    var k = 0;
+    var ppQuantities = [];
+    for (let i = 0; i < ppDataArr.length; i++) {
+        var rows = ppDataArr[i];
+        //console.log("31 rows: ", rows);
+        rows = rows.replace(/Decimal/gi,"");
+        //console.log("32 rows: ", rows);
+        rows = rows.replace(/[\{\}\[\]\(\)\'\"\?\*]/gi,""); // [빽슬러쉬+특수문자] 형태로 적어줘야 한다...
+        //rows = rows.replace(/[\{\}\(\)\'\"\?\*]/gi,""); // [빽슬러쉬+특수문자] 형태로 적어줘야 한다...
+        rows = rows.replace(/.0000/gi,"");
+        //console.log("40 rows.length: ", rows.length);
+        //console.log("40 typeof rows: ", typeof rows);
+        //console.log("40 rows: ", rows);
+
+        var ppQuantities = rows.split(",");
+        //console.log("50 ppQuantities: ", ppQuantities);
+
+        // 여기서는 날짜별 생산 수량을 모으는 것이고, 아래에서 다시 [제품별] 생산 수량 리스트를 반드시 만들어야 한다.
+        for (let j = 1; j <= ppQuantities.length; j++) {
+            ppQuantitiesDays[i][j - 1] = Number(ppQuantities[j - 1]);
+            //console.log("60 ppQuantities[j].length: ", ppQuantities[j].length);
+            //console.log("60 typeof ppQuantities[j]: ", typeof ppQuantities[j]);
+            //console.log(`60 i: ${i}, j: ${j}, ppQuantities[j]: ${ppQuantities[j]}`);
+            //console.log("61 ppQuantitiesDays[i][j].length: ", ppQuantitiesDays[i][j].length); 여긴 에러...
+            //console.log("61 typeof ppQuantitiesDays[i][j]: ", typeof ppQuantitiesDays[i][j]);
+            //console.log(`61 i: ${i}, j: ${j}, ppQuantitiesDays[i][j]: ${ppQuantitiesDays[i][j]}`);
+            //console.log(`61 i: ${i}, j: ${j}, ppQuantitiesDays[j]: ${ppQuantitiesDays[j]}`);
+        }
+
+    }
+
+    //console.log("70 ppQuantitiesDays.length: ", ppQuantitiesDays.length);
+    {#console.log("70 typeof ppQuantitiesDays: ", typeof ppQuantitiesDays);#}
+    {#console.log("70 ppQuantitiesDays: ", ppQuantitiesDays);#}
+
+    // 여기서 다 [제품별] 생산 수량 리스트를 반드시 만들어야 한다. 이넘이 실제로 그래프에서 사용할 수 있는 [data] 임에 주의.
+    var k = 0;
+    var graphData = Array.matrix(second, first, 0);
+    for (let i = 0; i < ppDataPeriodArr.length; i++) {
+        for (let j=0; j<productsArrList.length; j++) {
+            //console.log("71 ppQuantitiesDays[i][j]: *****", ppQuantitiesDays[i][j]);
+            graphData[j][i] = ppQuantitiesDays[i][j];
+            //console.log("71 typeof graphData[j][i]: ", typeof graphData[j][i]);
+            //console.log(`71 i: ${j}, j: ${i}, graphData[j]: ${graphData[j]}`);
+        }
+        k += 1;
+    }
+    {#console.log(`71 first: ${first}, second: ${second}`);#}
+    {#console.log("72 typeof graphData: ", typeof graphData);#}
+    {#console.log("72 graphData: ", graphData);#}
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 2021.02.21 Added. 생산 Volumes 수량 추가.
+    // arr[5][2] (빈 배열 생성)
+    // Arry 객체에 배열생성함수를 추가하여 2차원 배열을 생성하는 방법
+    Array.matrix2 = function (m, n, initial) {
+        var a, i, k, mat2 = [];
+        for (i = 0; i < m; i += 1) {
+            a = [];
+            for (k = 0; k < n; k += 1) {
+                a[k] = initial;
+            }
+            mat2[i] = a;
+        }
+        return mat2;
+    };
+
+    // matrix(행, 열, 기본값)
+    {#let first = ppDataPeriodArr.length;#}
+    {#let second = productsArr.length;#}
+    var ppVolumesDays = Array.matrix2(first, second, 0);
+
+    var k = 0;
+    var ppVolumes = [];
+    for (let i = 0; i < ppDataArr2.length; i++) {
+        var rows = ppDataArr2[i];
+        //console.log("31 rows: ", rows);
+        rows = rows.replace(/Decimal/gi,"");
+        //console.log("32 rows: ", rows);
+        rows = rows.replace(/[\{\}\[\]\(\)\'\"\?\*]/gi,""); // [빽슬러쉬+특수문자] 형태로 적어줘야 한다...
+        //rows = rows.replace(/[\{\}\(\)\'\"\?\*]/gi,""); // [빽슬러쉬+특수문자] 형태로 적어줘야 한다...
+        rows = rows.replace(/.0000/gi,"");
+        //console.log("40 rows.length: ", rows.length);
+        //console.log("40 typeof rows: ", typeof rows);
+        //console.log("40 rows: ", rows);
+
+        var ppVolumes = rows.split(",");
+        //console.log("50 ppQuantities: ", ppQuantities);
+
+        // 여기서는 날짜별 생산 수량을 모으는 것이고, 아래에서 다시 [제품별] 생산 수량 리스트를 반드시 만들어야 한다.
+        for (let j = 1; j <= ppVolumes.length; j++) {
+            ppVolumesDays[i][j - 1] = Number(ppVolumes[j - 1]);
+            // 2021.03.06 Conclusion. ***** 특히 주의 ***** : [생산 실적 자료]는 첫번째 값이 [날짜]이므로,
+            // 두번째부터 마지막 값까지 가져가면 되지만, [생산 Capacity 자료 등] 첫번째 값부터 가져가야 하는 경우에는,
+            // 반드시 아래와 같이 첫번째 값(Number(ppQuantities[j - ])부터,
+            // 마지막 값(let j = 1; j<= ppQuantities.length; j++)까지 가져가게 해야 함에 특히 주의... [<=]: 작거나 같은 것 까지...
+
+            //console.log("60 ppVolumes[j].length: ", ppVolumes[j].length);
+            //console.log("60 typeof ppVolumes[j]: ", typeof ppVolumes[j]);
+            //console.log(`60 i: ${i}, j: ${j}, ppVolumes[j]: ${ppVolumes[j]}`);
+            //console.log("61 ppVolumesDays[i][j].length: ", ppVolumesDays[i][j].length); 여긴 에러...
+            //console.log("61 typeof ppVolumesDays[i][j]: ", typeof ppVolumesDays[i][j]);
+            //console.log(`61 i: ${i}, j: ${j}, ppVolumesDays[i][j]: ${ppVolumesDays[i][j]}`);
+            //console.log(`61 i: ${i}, j: ${j}, ppVolumesDays[j]: ${ppVolumesDays[j]}`);
+        }
+
+    }
+
+    // 여기서 다 [제품별] 생산 수량 리스트를 반드시 만들어야 한다. 이넘이 실제로 그래프에서 사용할 수 있는 [data] 임에 주의.
+    var k = 0;
+    var graphData2 = Array.matrix(second, first, 0);
+    for (let i = 0; i < ppDataPeriodArr.length; i++) {
+        for (let j = 0; j < productsArrList.length; j++) {
+            //console.log("71 ppVolumesDays[i][j]: *****", ppVolumesDays[i][j]);
+            graphData2[j][i] = ppVolumesDays[i][j];
+            //console.log("71 typeof graphData2[j][i]: ", typeof graphData2[j][i]);
+            //console.log(`71 i: ${j}, j: ${i}, graphData2[j]: ${graphData2[j]}`);
+        }
+        k += 1;
+    }
+    {#console.log(`771 first: ${first}, second: ${second}`);#}
+    {#console.log("772 typeof graphData2: ", typeof graphData2);#}
+    {#console.log("772 graphData2: ", graphData2);#}
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    /*
+    let k = 0;
+    var ppQuantity;
+    var workdateCurr;
+    //var ppDataPeriodProcessClass = {days: [],};
+    for (let i = 0; i < ppDataPeriodProcessListArr.length; i++) {
+        var fromSingleQuotation = ppDataPeriodProcessListArr[i].indexOf("'");
+        //console.log("29 fromSingleQuotation: ", fromSingleQuotation);
+        var toSingleQuotation = ppDataPeriodProcessListArr[i].lastIndexOf("'");
+        //console.log("29 toSingleQuotation: ", toSingleQuotation);
+
+        var result = parseInt(i % (productsArr.length+1)); // 몫, [workdate] 컬럼 1개를 더해줘야 한다.
+        var remainder = i % (productsArr.length+1); // 나머지, [workdate] 컬럼 1개를 더해줘야 한다.
+        console.log(`for 내부: i: ${i}, productsArr.length: ${productsArr.length}`);
+        console.log("for 내부 remainder: ", remainder);
+
+        if (remainder === 0) {
+
+        }
+
+        if (remainder === 0) {
+            k = 0;
+            workdateCurr = ppDataPeriodProcessListArr[i].substring(fromSingleQuotation, toSingleQuotation);
+            console.log("for 내부 workdateCurr: ", workdateCurr);
+        } else {
+            if (fromSingleQuotation < 0) { // [0]이면, 빼 버리자...
+                ppQuantity = 0;
+            } else {
+                ppQuantity = Number(ppDataPeriodProcessListArr[i].substring(fromSingleQuotation + 1, toSingleQuotation - 1));
+            }
+
+            console.log(`i: ${i} ppQuantity: ${ppQuantity}, result: ${result}, k: ${k}`);
+            //if (ppQuantity > 0) {
+            ppQuantitiesDays[result][k] = ppQuantity;
+            k += 1;
+            //}
+
+        }
+    }
+
+    console.log("33 ppQuantitiesDays: ", ppQuantitiesDays);
+    console.log("29 ppDataPeriodProcessListArr: ", ppDataPeriodProcessListArr);
+    */
+
+    console.log("process.py productsArrList.length: ", productsArrList.length);
+    {#console.log("process.py processCodeCurrent.length: ", processCodeCurrent.length);#}
+
+    /*
+    // 그래프를 그린다...
+    var ctx = document.getElementById('myChart');
+
+    var config = {
+        type: 'radar',
+        data: {
+            labels: ppDataPeriodArrList, // [ ],
+            datasets: []
+        },
+        option: {
+            maintainAspectRatio: false,
+            title: {
+                display: true,
+                //onClick: toggleLegend(),
+                text: '생산 실적 분석'
+            },
+            scales: {
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: '차트'
+                    }
+                }]
+            },
+            legend: {
+                display: true,
+                //onClick: toggleLegend(),
+            },
+        }
+    };
+
+
+    function toggleLegend() {
+        //alert("레전드 클릭!!!");
+        console.log("Legend Clicked!!!");
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 상기 29 에서 직접 수정 : 문자열 없애기 ...
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //<div class="chart-container" style="position: relative; height: 300px; width: 90vw">
+    //<canvas id="myChart" height="100"></canvas>
+    // 레전드가 50개를 기준으로 화면 싸이즈를 조정한다.
+    console.log("process.py productsArrList.length: ", productsArrList.length);
+    if (productsArrList.length > 50) {
+        document.getElementById("chartLegend").style.height = 600 + "px";
+        document.getElementById("myChart").height = 200;
+        console.log("process.py 높이: ", 600);
+    } else {
+        document.getElementById("chartLegend").style.height = 300 + "px";
+        document.getElementById("myChart").height = 110;
+        console.log("process.py 높이: ", 300);
+    }
+    //console.log(">50 height: ", document.querySelector(".chart-container").offsetHeight)
+    //console.log(">50 height: ", document.querySelector("#myChart").offsetHeight)
+
+
+    // 차트 그리기
+    var myChart = new Chart(ctx, config);
+
+    // 데이터셋 세팅 : ppDataPeriodArr.length
+    for (let i = 0; i < graphData.length; i++) {
+        var color1 = Math.floor(Math.random() * 256);
+        var color2 = Math.floor(Math.random() * 256);
+        var color3 = Math.floor(Math.random() * 256);
+        //console.log(`80: ${color1} ${color2} ${color3}`)
+        var newDataset = {
+            label: productsArrList[i], //'new Dataset' + config.data.datasets.length,
+            backgroundColor: 'rgba(' + color1 + ', ' + color2 + ', ' + color3 + ', 1)',
+            borderColor: 'rgba(' + color1 + ', ' + color2 + ', ' + color3 + ', 1)',
+            data: graphData[i],
+            fill: false
+        };
+        // Chart에 newDataset 푸쉬
+        config.data.datasets.push(newDataset);
+    }
+
+    myChart.options.title.display = true;
+    myChart.options.title.text = '생산 실적 분석';
+    myChart.options.title.onClick = toggleLegend();
+
+    myChart.options.legend.display = true;
+
+    myChart.options.animation.duration = 1;
+
+    myChart.update(); // 차트 업데이트
+    */
+
+
+
+    /*
+    // 2021.02.23 Added. 그라프의 전체 범례를 한 번에 보이게, 안 보이게...
+    window.onload = function() {
+        var ctx = $('#myChart').get(0).getContext("2d");
+        window.myChart = new Chart(ctx, {
+            type: 'bar',
+            data: config.data,
+            options: {
+                legend: false,
+                legendCallback: function(myChart){
+                    return drawCustomLegend(myChart);
+                }// 사용자 범례를 만들 때 쓰는 함수를 지정하거나 작성한다.
+            }
+        });
+        $('#chartLegend').html(window.myChart.generateLegend());//사용자 범례 자리에 해당 차트에 대한 사용자 범례 코드를 넣는다.
+    };
+
+    $('#chartLegend').html(window.myChart.generateLegend()); // 사용자 범례 자리에 해당 차트에 대한 사용자 범례 코드를 넣는다.
+
+    function drawCustomLegend(myChart){
+        var text = [];
+        text.push('<ul class="' + myChart.id + '-legend">');
+        if(myChart.config.type == 'bar'){//막대차트, 막대라인차트일 경우
+            var barIndex = myChart.data.datasets.length;
+            for (var i = 0; i <myChart.data.datasets.length; i++) {
+                if(myChart.data.datasets[i].type == 'line' == false){
+                    barIndex = i;
+                    break;
+                }
+            } //라인 형식 데이터셋이 어디까지인지 확인
+            // -> 막대 형식의 데이터셋을 라인 형식의 데이터셋보다 앞에 둘 경우 라인이 막대에 묻히기 때문에 라인 형식이 먼저 올 수 밖에 없다.
+            // 그러나 막대 형식의 데이터셋의 범례를 먼저 그리고 싶었기 때문에 해당 작업을 했다.
+            for (var i = barIndex; i <myChart.data.datasets.length; i++) {
+                if(!(myChart.data.datasets[i].hideLegend) && myChart.data.datasets[i].label){
+                    text.push('<li datasetIndex="'+i+'"><span class="bar" style="background-color:' + myChart.data.datasets[i].backgroundColor + '" ></span>');
+                    text.push('<span>'+myChart.data.datasets[i].label+'</span>');
+                    text.push('</li>');
+                }
+            }//막대 형식 데이터셋의 범례를 먼저 그림
+            for (var i = 0; i <barIndex; i++) {
+                if(!(myChart.data.datasets[i].hideLegend) && myChart.data.datasets[i].label){
+                    text.push('<li datasetIndex="'+i+'"><div class="line" style="background:' + myChart.data.datasets[i].borderColor + '"></div>');
+                    text.push('<span>'+myChart.data.datasets[i].label+'</span>');
+                    text.push('</li>');
+                }
+            }//막대 형식 데이터셋의 범례를 그린 후 라인 형식 데이터셋의 범례를 그림.
+        } else if(myChart.config.type == 'line'){//라인 차트일 경우
+            for (var i = 0; i <myChart.data.datasets.length; i++) {
+                if(!(myChart.data.datasets[i].hideLegend) && myChart.data.datasets[i].label){
+                    text.push('<li datasetIndex="'+i+'"><span class="line" style="background-color:' + myChart.data.datasets[i].borderColor + '"></span>');
+                    text.push('<span>'+myChart.data.datasets[i].label+'</span>');
+                    text.push('</li>');
+                }
+            }
+        }
+        text.push('</ul>');
+        return text.join("");
+    }
+    */
+
+    /*
+    var options = {
+        legend: false,
+        legendCallback: function(chart) {
+            var elem = [];
+            elem.push('<ul class="custom-legends">');
+            for (var i = 0; i < chart.data.datasets[0].data.length; i++) {
+                elem.push('<li><span class="dot" style="background-color:' + chart.data.datasets[0].backgroundColor[i] + '"></span>');
+                if (chart.data.labels[i]) {
+                    elem.push(chart.data.labels[i]);
+                }
+                elem.push('</li>');
+            }
+            elem.push('</ul>');
+            return elem.join("");
+        },
+    }
+    var ctx = document.getElementById("myChart");
+    var myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: data,
+        options: options
+    });
+    console.log("여긴?")
+    var legentElement = document.getElementById("legend");
+    // insert custom HTML inside custom div
+    legentElement.innerHTML = myChart.generateLegend();
+    */
+
+
+    // 2021.02.21 Added. [생산 Volumes 수량] 추가는 [버튼 또는 RB 이벤트]를 통해,
+    // 기존 [생산 실적 수량]이 뿌려진 상태에서, 끼워 넣기 해 주도록 한다.
+    // 데이터셋 세팅 : ppDataPeriodArr.length
+    {#for (let i = 0; i < graphData.length; i++) {#}
+    {#    var color1 = Math.floor(Math.random() * 256);#}
+    {#    var color2 = Math.floor(Math.random() * 256);#}
+    {#    var color3 = Math.floor(Math.random() * 256);#}
+    {#    //console.log(`80: ${color1} ${color2} ${color3}`)#}
+    {#    var newDataset = {#}
+    {#        label: productsArrList[i], //'new Dataset' + config.data.datasets.length,#}
+    {#        backgroundColor: 'rgba(' + color1 + ', ' + color2 + ', ' + color3 + ', 1)',#}
+    {#        borderColor: 'rgba(' + color1 + ', ' + color2 + ', ' + color3 + ', 1)',#}
+    {#        data: graphData[i],#}
+    {#        fill: false#}
+    {#    };#}
+    {#    // Chart에 newDataset 푸쉬#}
+    {#    config.data.datasets.push(newDataset);#}
+    {##}
+    {#myChart.update(); // 차트 업데이트#}
+
+
+
+
+
+
+
+
+    /*
+    // 차트 그리기
+    //var myChart = new Chart(ctx, config);
+
+    // 데이터 변경
+    document.getElementById('reData').onclick = function() {
+        // 데이터셋 수 만큼 반복
+        var dataset = config.data.datasets;
+        for (var i = 0; i < dataset.length; i++) {
+            console.log("ppQuantities.length: ", ppQuantities.length);
+            console.log((dataset));
+            var data = dataset[i].data;
+            //for (var j = 0; j < data.length; j++) {
+            for (var j = 0; j < ppQuantities.length; j++) {
+                //data[j] = Math.floor(Math.random() * 50);
+                data[j] = ppQuantitiesDays[j];
+            }
+        }
+
+        myChart.update(); // 차트 업데이트
+    };
+
+
+    // 데이터 추가
+    document.getElementById('addData').onclick = function() {
+        // 라벨 추가
+        config.data.labels.push('data' + config.data.labels.length)
+        // 데이터셋 수 만큼 반복
+        var dataset = config.data.datasets;
+        for (var i = 0; i < dataset; i++) {
+            // 데이터셋의 데이터 추가
+            dataset[i].data.push(Math.floor(Math.random() * 50));
+        }
+        myChart.update(); // 차트 업데이트
+    };
+
+    // 데이터셋 추가
+    document.getElementById('addDataset').onclick = function() {
+        var color1 = Math.floor(Math.random() * 256);
+        var color2 = Math.floor(Math.random() * 256);
+        var color3 = Math.floor(Math.random() * 256);
+        console.log(color1 + " " + color2 + " " + color3)
+
+        var newDataset = {
+            label: 'new Dataset' + config.data.datasets.length,
+            backgroundColor: 'rgba(' + color1 + ', ' + color2 + ', ' + color3 + ', 1)',
+            borderColor: 'rgba(' + color1 + ', ' + color2 + ', ' + color3 + ', 1)',
+            data: [],
+            fill: false
+        }
+
+        // newDataset에 데이터 삽입
+        for (var i = 0; i < config.data.datasets.length; i++) {
+            var num = Math.floor(Math.random() * 50);
+            newDataset.data.push(num);
+        }
+
+        // Chart에 newDataset 푸쉬
+        config.data.datasets.push(newDataset);
+
+        myChart.update(); // 차트 업데이트
+
+    }
+
+    // 데이터 삭제
+    document.getElementById('delData').onclick = function() {
+        config.data.labels.splice(-1, 1); // 먼저 라벨 삭제
+
+        // 데이터 삭제
+        config.data.datasets.forEach(function (dataset) {
+            dataset.data.pop();
+        })
+        myChart.update(); //차트 업데이트
+    }
+
+    // 데이터셋 삭제
+    document.getElementById('delDataset').onclick = function() {
+        config.data.datasets.splice(-1, 1);
+        myChart.update() // 차트 업데이트
+    }
+    */
+
+
+    /*
+    참고 자료
+    1. 차트 내부에 값을 항상 표시하기.
+    tooltips: {
+        enabled: false
+    },
+    hover: {
+        animationDuration: 0
+    },
+    animation: {
+        duration: 1,
+        onComplete: function () {
+            var chartInstance = this.chart,
+                ctx = chartInstance.ctx;
+            ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+            ctx.fillStyle = 'purple';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+
+            this.data.datasets.forEach(function (dataset, i) {
+                var meta = chartInstance.controller.getDatasetMeta(i);
+                meta.data.forEach(function (bar, index) {
+                    var data = dataset.data[index];
+                    ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                });
+            });
+        }
+    }
+     */
+
+
+</script>
+
+{#{% endblock %}#}
+

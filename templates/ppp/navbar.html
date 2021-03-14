@@ -1,0 +1,105 @@
+{% load static %}
+{#<br>#}
+{#<br>#}
+<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+    <!-- Navbar 햄버거 아이콘-->
+    <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
+
+    <div id="navBarAll" class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
+        <a class="navbar-brand" href="">PSC 제조 관리</a>
+    </div>
+
+    {% csrf_token %}
+    {#    <form action="{% url 'period' %}" method="POST">#}
+    {#    <form action="" method="get">#}
+    {#        <fieldset>#}
+    {#            <li class="nav-item dropdown">#}
+    {#                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>#}
+    {#                <div class="dropdown-menu" aria-labelledby="navbarDropdown">#}
+    {#                    {% csrf_token %}#}
+    {#                    {% for p in process %}#}
+    {#                        <a class="dropdown-item" href="#">{{ p.code }}</a>#}
+    {#                        <a class="dropdown-item" href="#">{{ p.language2 }}</a>#}
+    {#                        <div class="dropdown-divider"></div>#}
+    {#                    {% endfor %}#}
+    {#                </div>#}
+    {#            </li>#}
+    {#            <select id="status" name="status">#}
+    {#                <option value="P" {% if status != 'D' %} selected {%  endif %}>월별 공정간</option>#}
+    {#                <option value="D" {% if status == 'D' %} selected {%  endif %}>월별 일간</option>#}
+    {#            </select>#}
+    {#            <div class="radio" style="display: inline">#}
+    {#                <label> <input type="radio" name="optionRadios" id="optionsRadios1" value="total"#}
+    {#                        {% if optionRadios != 'period' %} checked {% endif %}>전체</label>#}
+    {#            </div>#}
+    {#            <div class="radio" style="display: inline">#}
+    {#                <label> <input type="radio" name="optionRadios" id="optionsRadios2" value="period"#}
+    {#                        {% if optionRadios == 'period' %} checked {% endif %}>기간:</label>#}
+    {#                <input id="fromDate" data-provide="datepicker" data-date-format="yyyy-mm-dd" name="from_date" value={{ from_date }}>#}
+    {#                <label> ~ </label>#}
+    {#                <input id="toDate" data-provide="datepicker" data-date-format="yyyy-mm-dd" name="to_date" value={{ to_date }}>#}
+    {#                <label> ~ </label>#}
+    {#            </div>#}
+
+    {#        </fieldset>#}
+    {#    </form>#}
+
+    <!-- Navbar 공정, 아래 [class="d-none"] 부분을 빼면, 화면을 줄였을 때도 계속 보인다.공정은 아래 표에서도 선택할 수 있다. -->
+    <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
+        <div class="input-group">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    {% csrf_token %}
+                    {% for p in qrProcess %}
+                        <a class="dropdown-item" href="#">{{ p.code }} {{ p.language2 }}</a>
+                        <div class="dropdown-divider"></div>
+                    {% endfor %}
+                </div>
+            </li>
+        </div>
+    </form>
+
+    <!-- Navbar 기간, 아래 [class="d-none"] 부분을 빼면, 화면을 줄였을 때도 계속 보인다.-->
+    <!-- <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0"> -->
+    <form class="d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
+        <div class="input-group">
+            <input class="form-control" type="text" placeholder="부터" id="fromDate" data-provide="datepicker" data-date-format="yyyy-mm-dd" name="fromDate" value="{{ fromDate }}" aria-describedby="basic-addon2"> -
+            <input class="form-control" type="text" placeholder="까지" id="toDate" data-provide="datepicker" data-date-format="yyyy-mm-dd" name="toDate" value="{{ toDate }}" aria-describedby="basic-addon2">
+            <div class="input-group-append">
+                <!-- ***** 여기 [type="submit"]가 되면, MultiValueDictKeyError 발생함 *****  -->
+                <button class="btn btn-primary" type="button" id="period" href=""><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Navbar Search-->
+    <div id="monthInfo" class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
+        <a class="navbar-brand"></a>
+{#        <a class="navbar-brand">근무 23일, 가동률 57%</a>#}
+    </div>
+{#    <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">#}
+{#        <div class="input-group">#}
+{#            <input class="form-control" type="text" placeholder="찾기..." aria-label="Search" aria-describedby="basic-addon2" />#}
+{#            <div class="input-group-append">#}
+{#                <button class="btn btn-primary" type="button"><i class="fas fa-search"></i></button>#}
+{#            </div>#}
+{#        </div>#}
+{#    </form>#}
+
+    <!-- Navbar 햄버거 아이콘 2021.03.13 Conclusion. 맨 위로 올려서, [navbar> 맨 왼쪽에 나오도록 한다.-->
+    <!-- <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>-->
+
+    <!-- Navbar-->
+    <ul class="navbar-nav ml-auto ml-md-0">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                <a class="dropdown-item" href="#">Settings</a>
+                <a class="dropdown-item" href="#">Activity Log</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="login.html">Logout</a>
+            </div>
+        </li>
+    </ul>
+</nav>

@@ -1,0 +1,53 @@
+    <a class="btn btn-primary  btn-sm btn-block" href="">공정 정보</a>
+    <div class="table-responsive" id="process_data">
+{#        <table class="table table-sm">#}
+        <table id="process-list" class="table table-sm">
+            <tr>
+                <th></th> <!--여기는 아래 <td> View 컬럼을 쓰기 위해, 1개의 <th> 삽입...-->
+                <!-- <th>코드</th> -->
+                <!-- <th>공정</th> -->
+            </tr>
+            {% csrf_token %}
+            {% for p in qrProcess %}
+{#                <tr id="process-info">#}
+{#                <tr id="process-info" onselect="onselect(this)">#}
+{#                <tr id="process-info" onselect="onselect()">#}
+{#                <tr id="process-info" onselect="onmousedown(this)">#}
+{#                <tr id="process-info">#}
+                <tr>
+{#                    <input class="btn btn-danger" type="button" name="process_id[]" value="{{ p.0 }}" id="process-info">#}
+{#                    <!-- <td><a class="btn btn-sm btn-info" id="sidebarToggle1" href="{% url 'process-selected' p.0 %}"><=</a></td> -->#}
+{#                    <td><a class="btn btn-sm btn-info" id="processSelected" href="{% url 'process-selected' p.0 %}"><=</a></td>#}
+{#                    <td><a class="btn btn-sm btn-info" id="processSelected" href=""><=</a></td>#}
+{#                    <td><a class="btn btn-sm btn-info" id="processSelected" href="{% url 'period' p.0 %}"><=</a></td>#}
+{#                    <td><a class="btn btn-sm btn-info" id="processSelected" href="navbar.html#period"><=</a></td>#}
+
+                    <!-- 여기서 어떻게 날짜 기간 값을 공정 코드 값이랑 [같이] 전달할까요????????????????????????????? -->
+{#                    <td><a class="btn btn-sm btn-info" id="process-selected" href="" type="button" onclick="onclick"><=</a></td>#}
+{#                    <td><button class="btn btn-sm btn-info" id="process-selected" type="button" onclick="getProduction()"><=</button></td>#}
+{#                    <td><button class="btn btn-sm btn-info" id="process-selected" type="button" onselect="onselect"><=</button></td>#}
+
+                    {#<!-- 2021.02.10 Added. 아래 2줄을 참고하여, 1개의 조회 버튼.[<=]에 대한 기능을 ajax로 구현한다.  -->#}
+                    {#<!-- <td><input type="checkbox" name="product_id[]" value="{{ p.0 }}" id="delete_product"></td> -->#}
+                    {#<!-- <button type="submit" class="btn_delete">Delete</button> -->#}
+
+{#                    <td><a class="btn btn-sm btn-info" id="process-selected" href="{% url 'process-selected' p.0 %}"><=</a></td>#}
+{#                    <td><a class="btn btn-sm btn-info" id="{{ p.0 }}" href="{% url 'process-selected' p.0 %}"></a>{{ p.0 }}</td>#}
+{#                    <td id="process-code" type="button" class="btn btn-info">{{ p.0 }}</td>#}
+
+{#                    <td id="process-code" type="button" class="btn btn-info">{{ p.0 }}</td>#}
+{#                    <td>{{ p.2 }}</td>#}
+                    <td id="process-code" type="button" class="btn btn-info">{{ p.code }}</td>
+                    {{ getLanguage }}
+                    {% if LANGUAGE_NO == 1042 %}
+                        <td id="process-name">{{ p.language2 }}</td>
+                    {% else %}
+                        <td id="process-name">{{ p.language3 }}</td>
+                    {% endif %}
+
+
+{#                    <td><input type="checkbox" name="process_code[]" value="{{ p.0 }}" id="process_check"></td>#}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>

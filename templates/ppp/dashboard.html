@@ -1,0 +1,63 @@
+{% extends 'ppp/base.html' %}
+{% block content %}
+
+    <div id="layoutSidenav_content">
+        <main>
+
+            {% include 'ppp/status.html' %}
+
+            <br>
+            <div class="row">
+                <div class="col-md-3"> <!--여기는 전체 화면에 5칸을 쓴다는 의미이고, 아래에서 7칸을 쓴다는 의미...-->
+                    <!--			<h5>PROCESS: </h5>-->
+                    <!--			<hr>-->
+                    <div class="card card-body">
+                        <a class="btn btn-primary  btn-sm btn-block" href="">Create process</a>
+                        <table class="table table-sm">
+                            <tr>
+                                <th></th> <!--여기는 아래 <td> View 컬럼을 쓰기 위해, 1개의 <th> 삽입...-->
+                                <th>공정코드</th>
+                                <th>공정명</th>
+                                {% for p in process %}
+                                    <tr>
+                                        <td><a class="btn btn-sm btn-info" href="{% url 'process' p.0 %}">보기</a></td>
+                                        <td>{{ p.0 }}</td>
+                                        <td>{{ p.2 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-md-9"> <!--여기는 전체 화면에 7칸을 쓴다는 의미이고, 위에서 5칸을 쓴다는 의미...-->
+                    <!--			<h5>LAST 5 PRODUCTION PERFORMANCE</h5>-->
+                    <!--			<hr>-->
+                    <div class="card card-body">
+                        <a class="btn btn-primary  btn-sm btn-block" href="">Create Production Performance</a>
+                        <table class="table table-sm">
+                            <tr>
+                                <th>Production No.</th>
+                                <th>Specification</th>
+                                <th>Goodness</th>
+                                <th>Process</th>
+                                <th>Update</th>
+                                <th>Delete</th>
+                            </tr>
+                            {% for pp_data in pp_data_period %}
+                                <tr>
+                                    <td>{{ pp_data.1 }}</td>
+                                    <td>{{ pp_data.3 }}</td>
+                                    <td>{{ pp_data.4 }}</td>
+                                    <td>{{ pp_data.5 }}</td>
+                                    <td><a class="btn btn-sm btn-info" href="">Update</a> </td>
+                                    <td><a class="btn btn-sm btn-danger" href="">Delete</a> </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+{% endblock %}

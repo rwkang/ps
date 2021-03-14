@@ -1,0 +1,103 @@
+{% extends 'ppp/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div id="layoutSidenav">
+
+    {% include 'ppp/sidebar.html' %}
+
+    <div id="layoutSidenav_content">
+
+        <!-- <main> : 사이드바와 간격이 너무 붙어서, 왼쪽을 띄우기 위해, status.html 부분을 <main>에서 제외시켰다. -->
+
+        {% include 'ppp/status.html' %}
+
+        <main>
+
+            <div class="container-fluid">
+
+                <!-- 그래프 부분 -->
+
+                <div class="row">
+                                        <div class="col-md-12"> <!--여기는 전체 화면에 5칸을 쓴다는 의미이고, 아래에서 7칸을 쓴다는 의미...-->
+                    <div class="col-xl-12">
+                        <div class="card mb-4">
+                                                            <div class="card-header">
+                                                                <i class="fas fa-chart-area mr-1"></i>
+                                                                Bar Chart Example
+                                                            </div>
+                            <!-- <div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div> -->
+                                                        <div class="card-body"><canvas id="myChartBar" width="100%" height="40"></canvas></div>
+                                                            <canvas id="myChartBar" width="400" height="400"></canvas>
+                                                        <canvas id="myChartBarProcess" height="300"></canvas>
+
+                            {% include 'ppp/pp_process_analysis.html' %}
+
+                                                        {% block content_chart1 %}
+
+                                                        {% endblock content_chart1 %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6"> <!--여기는 전체 화면에 5칸을 쓴다는 의미이고, 아래에서 7칸을 쓴다는 의미...-->
+                        <div class="col-xl-12">
+                            <div class="card mb-4">
+                                                            <div class="card-header">
+                                                                <i class="fas fa-chart-bar mr-1"></i>
+                                                                Area Chart Example
+                                                            </div>
+                                <!-- <div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div> -->
+                                <canvas id="myChartBarProduct" height="300"></canvas>
+                                                            {% block content_chart2 %}
+
+                                                            {% endblock content_chart2 %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 표 부분 -->
+                <div class="row">
+                    <div class="col-md-2"> <!--여기는 전체 화면에 5칸을 쓴다는 의미이고, 아래에서 7칸을 쓴다는 의미...-->
+                        <div class="card card-body">
+
+                            {% include 'ppp/table_process.html' %}
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-10"> <!--여기는 전체 화면에 7칸을 쓴다는 의미이고, 위에서 5칸을 쓴다는 의미...-->
+                        <!-- <div class="card-header">
+                            <i class="fas fa-table mr-1"></i>
+                            DataTable Example
+                        </div> -->
+                        <div class="card card-body">
+
+                            {% include 'ppp/table_pp_data.html' %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="py-4 bg-light mt-auto">
+            <div class="container-fluid">
+                <div class="d-flex align-items-center justify-content-between small">
+                    <div class="text-muted">Copyright &copy; Your Website 2020</div>
+                    <div>
+                        <a href="#">Privacy Policy</a>
+                        &middot;
+                        <a href="#">Terms &amp; Conditions</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+</div>
+
+{% endblock %}
+

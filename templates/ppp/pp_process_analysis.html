@@ -1,0 +1,16 @@
+{% extends 'ppp/index.html' %}
+
+{% load static %}
+
+ <!-- 여기 아래 문장은 그래프 설정 -->
+
+{% block contentChart1 %}
+
+    <!-- <h1>공정별 생산 분석</h1> -->
+    <canvas id="myChartBarProcess" height="300"></canvas>
+
+    <script src="{% static 'js/pp_process_analysis.js' %}"></script> <!-- index.html 로 이동 -->
+
+{% endblock contentChart1 %}
+
+
